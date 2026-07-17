@@ -32,11 +32,11 @@ jobs:
       - name: Check canonical naming
         run: python3 scripts/check_repository_policy.py
 
-      - name: Check formatting
-        run: ./mvnw -B -ntp spotless:check
+      - name: Check documentation
+        run: python3 scripts/check_documentation.py
 
-      - name: Run tests
-        run: ./mvnw -B -ntp test
+      - name: Verify SDK
+        run: ./mvnw -B -ntp verify
 
-      - name: Build package
-        run: ./mvnw -B -ntp package -DskipTests
+      - name: Smoke-test installed SDK
+        run: scripts/smoke_install.sh
