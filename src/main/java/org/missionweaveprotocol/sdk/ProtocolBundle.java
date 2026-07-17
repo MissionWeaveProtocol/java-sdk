@@ -1,9 +1,5 @@
 package org.missionweaveprotocol.sdk;
 
-import com.fasterxml.jackson.core.StreamReadFeature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,11 +53,6 @@ public final class ProtocolBundle {
   static final String INDEX_RESOURCE = "META-INF/missionweaveprotocol/protocol-bundle.index";
 
   private static final List<String> ARTIFACT_NAMES = List.of("schemas", "conformance");
-  private static final ObjectMapper JSON =
-      JsonMapper.builder()
-          .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
-          .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-          .build();
 
   private ProtocolBundle() {}
 
@@ -131,7 +122,7 @@ public final class ProtocolBundle {
   }
 
   private static Pin readPin(InputStream input) throws IOException {
-    return JSON.readValue(input, Pin.class);
+    return StrictJson.mapper().treeToValue(StrictJson.parse(input.readAllBytes()), Pin.class);
   }
 
   private static void validatePin(Pin pin) {

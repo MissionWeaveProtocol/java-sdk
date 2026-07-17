@@ -31,8 +31,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.release>21</maven.compiler.release>
-    <jackson.version>2.18.3</jackson.version>
+    <jackson.version>2.18.4</jackson.version>
+    <json-schema-validator.version>2.0.4</json-schema-validator.version>
+    <jcs.version>1.1</jcs.version>
     <junit.version>5.11.4</junit.version>
+    <slf4j.version>2.0.17</slf4j.version>
     <spotless.version>3.8.0</spotless.version>
     <google-java-format.version>1.35.0</google-java-format.version>
   </properties>
@@ -45,10 +48,30 @@
     </dependency>
 
     <dependency>
+      <groupId>com.networknt</groupId>
+      <artifactId>json-schema-validator</artifactId>
+      <version>${json-schema-validator.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.erdtman</groupId>
+      <artifactId>java-json-canonicalization</artifactId>
+      <version>${jcs.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 
