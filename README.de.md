@@ -28,7 +28,7 @@ Das offizielle Java-21-SDK zum Validieren, Kanonisieren, Signieren und Testen vo
 | SDK-Koordinaten | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Protokollversion | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Protokoll-Commit | [`5821df8f0c07893f193af1908235888a0154fb6e`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/5821df8f0c07893f193af1908235888a0154fb6e) |
+| Protokoll-Commit | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
 | JSON Schema | 21 |
 | Konformitätsvektoren | 43: 22 gültig und 21 ungültig |
 

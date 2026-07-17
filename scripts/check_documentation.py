@@ -27,7 +27,7 @@ REQUIRED_README_TEXT = (
     "org.missionweaveprotocol",
     "missionweaveprotocol-sdk",
     "0.1.0-SNAPSHOT",
-    "5821df8f0c07893f193af1908235888a0154fb6e",
+    "00964ea9064cbf1f0eca8af21a0c57367ee14752",
     "FrameCodec",
     "SchemaCatalog",
     "DocumentSignatures",

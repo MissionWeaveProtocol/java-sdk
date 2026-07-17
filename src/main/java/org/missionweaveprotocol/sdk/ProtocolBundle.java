@@ -29,7 +29,7 @@ public final class ProtocolBundle {
       "https://github.com/missionweaveprotocol/missionweaveprotocol";
 
   /** Exact source commit recorded by the protocol pin. */
-  public static final String COMMIT = "5821df8f0c07893f193af1908235888a0154fb6e";
+  public static final String COMMIT = "00964ea9064cbf1f0eca8af21a0c57367ee14752";
 
   /** Protocol version recorded by the protocol pin. */
   public static final String PROTOCOL_VERSION = "0.1";
