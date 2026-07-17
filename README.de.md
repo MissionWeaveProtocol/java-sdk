@@ -6,7 +6,7 @@ Das offizielle Java-21-SDK zum Validieren, Kanonisieren, Signieren und Testen vo
 [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionweaveprotocol)
 0.1-Daten.
 
-> Konformitätsaussage: ausschließlich **schema-and-vector conformance only**. Das SDK beansprucht keine vollständige Laufzeit-Protokollkonformität.
+> Konformitätsaussage: ausschließlich **Schema- und Vektorkonformität**. Das SDK beansprucht keine vollständige Laufzeit-Protokollkonformität.
 
 ## Voraussetzungen und Abhängigkeit
 
@@ -117,7 +117,7 @@ Das enthaltene Ergebnis lautet `43/43 conformance vectors passed`.
 - Schema-Validierung prüft Dokumentform und format. Sie gewährt keine Autorität, authentifiziert keinen Agent und beweist nicht, dass eine Aktion erlaubt ist.
 - Signaturhilfen bieten weder Schlüsselvertrauen, Speicherung, Auffindung oder Widerruf noch Zeitstempelrichtlinien, Replay-Schutz oder session- und membership-fencing.
 - `FrameCodec` ist ein Serialisierer, kein transport, coordinator, worker scheduler, dauerhafter Speicher, Retry-Engine oder Zustandsmaschinenimplementierung.
-- Ein `43/43`-Ergebnis belegt nur schema-and-vector conformance; es stellt keine Interoperabilität, kein vollständiges Verhalten, keine Sicherheit und keine Produktionsreife fest.
+- Ein `43/43`-Ergebnis belegt nur Schema- und Vektorkonformität; es stellt keine Interoperabilität, kein vollständiges Verhalten, keine Sicherheit und keine Produktionsreife fest.
 
 ## Entwicklung
 
