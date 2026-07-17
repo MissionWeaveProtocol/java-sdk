@@ -35,6 +35,8 @@
     <json-schema-validator.version>2.0.4</json-schema-validator.version>
     <jcs.version>1.1</jcs.version>
     <junit.version>5.11.4</junit.version>
+    <build-helper.version>3.6.1</build-helper.version>
+    <exec.version>3.5.0</exec.version>
     <slf4j.version>2.0.17</slf4j.version>
     <spotless.version>3.8.0</spotless.version>
     <google-java-format.version>1.35.0</google-java-format.version>
@@ -93,6 +95,32 @@
     </resources>
 
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>${build-helper.version}</version>
+        <executions>
+          <execution>
+            <id>compile-examples</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/examples/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${exec.version}</version>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -166,6 +194,11 @@
         <version>${spotless.version}</version>
         <configuration>
           <java>
+            <includes>
+              <include>src/main/java/**/*.java</include>
+              <include>src/test/java/**/*.java</include>
+              <include>examples/src/main/java/**/*.java</include>
+            </includes>
             <googleJavaFormat>
               <version>${google-java-format.version}</version>
               <style>GOOGLE</style>
