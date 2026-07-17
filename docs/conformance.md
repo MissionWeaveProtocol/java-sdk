@@ -5,7 +5,7 @@
 SDK version `0.1.0-SNAPSHOT` targets MissionWeaveProtocol `0.1` and the wire
 namespace `missionweaveprotocol`. The vendored bundle is pinned to protocol
 commit
-[`5821df8f0c07893f193af1908235888a0154fb6e`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/5821df8f0c07893f193af1908235888a0154fb6e).
+[`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752).
 
 `PROTOCOL_PIN.json` records the authoritative source, file counts, and SHA-256
 tree digests:
