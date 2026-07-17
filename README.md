@@ -4,10 +4,14 @@ The MissionWeaveProtocol Java SDK is the official Java 21 implementation of the
 [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionweaveprotocol)
 schema and conformance bundle.
 
-This repository is under active development. The current foundation provides a
-reproducible Maven build, formatting, tests, packaging, canonical naming checks,
-and protected GitHub CI. Protocol resources and validation APIs are added in
-subsequent pull requests.
+This repository is under active development. It provides a reproducible Maven
+build and ships the pinned MissionWeaveProtocol 0.1 schema and conformance
+bundle. Validation, codec, and signing APIs are added in subsequent pull
+requests.
+
+The packaged resources are pinned by [`PROTOCOL_PIN.json`](PROTOCOL_PIN.json) to
+protocol commit `5821df8f0c07893f193af1908235888a0154fb6e`. The build verifies
+their file counts and SHA-256 tree digests before it succeeds.
 
 ## Requirements
 
