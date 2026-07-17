@@ -4,14 +4,18 @@ The MissionWeaveProtocol Java SDK is the official Java 21 implementation of the
 [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionweaveprotocol)
 schema and conformance bundle.
 
-This repository is under active development. It provides a reproducible Maven
-build and ships the pinned MissionWeaveProtocol 0.1 schema and conformance
-bundle. Validation, codec, and signing APIs are added in subsequent pull
-requests.
+This repository is under active development. It provides strict JSON parsing,
+offline Draft 2020-12 schema validation, RFC 8785 canonicalization, SHA-256 and
+Ed25519 helpers, a generic validating WebSocket frame codec, and the complete
+pinned MissionWeaveProtocol 0.1 schema-and-vector bundle.
 
 The packaged resources are pinned by [`PROTOCOL_PIN.json`](PROTOCOL_PIN.json) to
 protocol commit `5821df8f0c07893f193af1908235888a0154fb6e`. The build verifies
 their file counts and SHA-256 tree digests before it succeeds.
+
+The current conformance claim is deliberately limited to the 21 packaged JSON
+Schemas and 43 implementation-neutral vectors. It is not a claim of complete
+MissionWeaveProtocol runtime conformance.
 
 ## Requirements
 
