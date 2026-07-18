@@ -37,8 +37,8 @@ dokumentiert Quelle, Dateianzahlen und SHA-256-Baum-Digests.
 
 ## Funktionen
 
-- `StrictJson` verwirft doppelte Objekt-Member, ungültiges UTF-8 und nachgestellte Daten an der Vertrauensgrenze.
-- `SchemaCatalog` kompiliert die 21 Draft-2020-12-Schemata in eine vollständig offline arbeitende Registry mit aktivierten format assertions.
+- `StrictJson` verwirft doppelte Objektmitglieder, ungültiges UTF-8 und nachgestellte Daten an der Vertrauensgrenze.
+- `SchemaCatalog` kompiliert die 21 Draft-2020-12-Schemata in eine vollständig offline arbeitende Registry mit aktivierten Format-Assertions.
 - `FrameCodec` dekodiert, validiert und kanonisch kodiert generische MissionWeaveProtocol-WebSocket-Frames; er stellt keine Verbindung her.
 - `CanonicalJson` bietet RFC 8785 JCS und SHA-256-Bezeichner.
 - `Ed25519`, `Base64Url` und `DocumentSignatures` bieten JDK-Ed25519-Signaturen, ungepolstertes base64url und das Auslassen des obersten `signature`-Feldes.
@@ -114,9 +114,9 @@ Das enthaltene Ergebnis lautet `52/52 conformance vectors passed`.
 
 ## Sicherheits- und Verhaltensgrenzen
 
-- Schema-Validierung prüft Dokumentform und format. Sie gewährt keine Autorität, authentifiziert keinen Agent und beweist nicht, dass eine Aktion erlaubt ist.
-- Signaturhilfen bieten weder Schlüsselvertrauen, Speicherung, Auffindung oder Widerruf noch Zeitstempelrichtlinien, Replay-Schutz oder session- und membership-fencing.
-- `FrameCodec` ist ein Serialisierer, kein transport, coordinator, worker scheduler, dauerhafter Speicher, Retry-Engine oder Zustandsmaschinenimplementierung.
+- Schema-Validierung prüft Dokumentstruktur und Formate. Sie gewährt keine Autorität, authentifiziert keinen Agent und beweist nicht, dass eine Aktion erlaubt ist.
+- Signaturhilfen bieten weder Vertrauensverwaltung für Schlüssel noch deren Speicherung, Auffindung oder Widerruf; ebenso wenig bieten sie Zeitstempelrichtlinien, Replay-Schutz oder Fencing mittels Session Epoch und Membership Epoch.
+- `FrameCodec` ist ein Serialisierer, kein Transport, Koordinator, Worker-Scheduler, dauerhafter Speicher, Retry-Engine oder Zustandsmaschinenimplementierung.
 - Ein `52/52`-Ergebnis belegt nur Schema- und Vektorkonformität; es stellt keine Interoperabilität, kein vollständiges Verhalten, keine Sicherheit und keine Produktionsreife fest.
 
 ## Entwicklung

@@ -74,7 +74,7 @@ public final class QuickStart {
 
 ## Exemples exécutables
 
-Le build compile et teste les trois exemples du dépôt :
+Le processus de compilation construit et teste les trois exemples du dépôt :
 
 ```bash
 ./mvnw -q -Dexec.classpathScope=test \
@@ -115,8 +115,8 @@ Le résultat inclus est `52/52 conformance vectors passed`.
 ## Limites de sécurité et de comportement
 
 - La validation des schémas vérifie la forme et les formats du document. Elle n’accorde aucune autorité, n’authentifie pas un Agent et ne prouve pas qu’une action est autorisée.
-- Les outils de signature ne fournissent pas la confiance, le stockage, la découverte ou la révocation des clés, la politique d’horodatage, la prévention des rejeux, ni le fencing de session et de membership.
-- `FrameCodec` est un sérialiseur, pas un transport, coordinator, worker scheduler, stockage durable, moteur de nouvelle tentative ou implémentation de machine à états.
+- Les outils de signature ne gèrent ni la confiance accordée aux clés, ni leur stockage, leur découverte ou leur révocation ; ils n’offrent pas non plus de politique d’horodatage, de prévention des rejeux ou de fencing par Session Epoch et Membership Epoch invalidant les autorités obsolètes.
+- `FrameCodec` est un sérialiseur, pas un transport, un coordinateur, un ordonnanceur de Workers, un stockage durable, un moteur de nouvelle tentative ou une implémentation de machine à états.
 - Un résultat `52/52` démontre uniquement une conformité limitée aux schémas et aux vecteurs ; il n’établit ni interopérabilité, ni comportement complet, ni sécurité, ni aptitude à la production.
 
 ## Développement

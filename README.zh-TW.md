@@ -38,8 +38,8 @@ JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 ## 能力
 
 - `StrictJson` 在信任邊界拒絕重複物件成員、無效 UTF-8 與尾隨資料。
-- `SchemaCatalog` 將 21 個 Draft 2020-12 Schema 編譯為完全離線的登錄庫，並啟用 format 斷言。
-- `FrameCodec` 嚴格解碼、驗證並正規編碼通用 MissionWeaveProtocol WebSocket frame；它不建立連線。
+- `SchemaCatalog` 將 21 個 Draft 2020-12 Schema 編譯為完全離線的登錄庫，並啟用格式斷言。
+- `FrameCodec` 嚴格解碼、驗證並正規編碼通用 MissionWeaveProtocol WebSocket 訊框；它不建立連線。
 - `CanonicalJson` 提供 RFC 8785 JCS 與 SHA-256 識別碼。
 - `Ed25519`、`Base64Url` 與 `DocumentSignatures` 提供 JDK Ed25519 簽署、無填補 base64url，以及頂層 `signature` 省略。
 - `ConformanceRunner` 與 `ConformanceCli` 執行全部 52 個內建向量。
@@ -114,10 +114,10 @@ public final class QuickStart {
 
 ## 安全與行為邊界
 
-- Schema 驗證檢查文件結構與 format；它不會授予權限、驗證 Agent 身分，或證明某個動作獲准。
-- 簽章輔助工具不提供金鑰信任、儲存、探索、撤銷、時間戳記政策、重播防護，也不處理 session 與 membership fencing。
-- `FrameCodec` 是序列化器，不是 transport、coordinator、worker scheduler、持久化儲存、重試引擎或狀態機實作。
-- `52/52` 結果僅證明 schema-and-vector conformance；它不代表互通性、完整行為、安全性或生產就緒性。
+- Schema 驗證檢查文件結構與格式；它不會授予權限、驗證 Agent 身分，或證明某個動作獲准。
+- 簽章輔助工具不提供金鑰信任、儲存、探索、撤銷、時間戳記政策、重播防護，也不提供透過 Session Epoch 與 Membership Epoch 使舊 Session 權限或舊 Membership 權限失效的 fencing。
+- `FrameCodec` 是序列化器，不是傳輸層、Coordinator、Worker Scheduler、持久化儲存、重試引擎或狀態機實作。
+- `52/52` 結果僅證明 Schema 與測試向量符合性；它不代表互通性、完整行為、安全性或生產就緒性。
 
 ## 開發
 
