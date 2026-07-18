@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /** Strict UTF-8 JSON parsing with duplicate-member and trailing-data rejection. */
@@ -19,9 +22,20 @@ public final class StrictJson {
   /** Parse exactly one UTF-8 JSON value. */
   public static JsonNode parse(byte[] document) throws IOException {
     Objects.requireNonNull(document, "document");
-    try (JsonParser parser = MAPPER.createParser(document)) {
-      return readOne(parser);
+    if (document.length >= 3
+        && document[0] == (byte) 0xef
+        && document[1] == (byte) 0xbb
+        && document[2] == (byte) 0xbf) {
+      throw new IOException("JSON document starts with a UTF-8 byte-order mark");
     }
+    String decoded =
+        StandardCharsets.UTF_8
+            .newDecoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT)
+            .decode(ByteBuffer.wrap(document))
+            .toString();
+    return parse(decoded);
   }
 
   /** Parse exactly one JSON value from a Java string. */

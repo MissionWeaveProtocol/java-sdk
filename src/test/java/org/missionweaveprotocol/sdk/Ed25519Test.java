@@ -52,6 +52,7 @@ class Ed25519Test {
   @Test
   void rejectsPaddedOrWrongLengthKeys() {
     assertThrows(IllegalArgumentException.class, () -> Base64Url.decode("YQ=="));
+    assertThrows(IllegalArgumentException.class, () -> Base64Url.decode("YR"));
     assertThrows(IllegalArgumentException.class, () -> Ed25519.loadPrivateKey("YQ"));
     assertThrows(IllegalArgumentException.class, () -> Ed25519.loadPublicKey("YQ"));
   }

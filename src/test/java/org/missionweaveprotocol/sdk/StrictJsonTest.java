@@ -23,13 +23,30 @@ class StrictJsonTest {
 
   @Test
   void rejectsInvalidUtf8() {
-    byte[] prefix = "{\"value\":\"".getBytes(StandardCharsets.UTF_8);
-    byte[] document = new byte[prefix.length + 3];
-    System.arraycopy(prefix, 0, document, 0, prefix.length);
-    document[prefix.length] = (byte) 0xff;
-    document[prefix.length + 1] = '"';
-    document[prefix.length + 2] = '}';
+    assertThrows(IOException.class, () -> StrictJson.parse(stringDocument((byte) 0xff)));
+    assertThrows(
+        IOException.class, () -> StrictJson.parse(stringDocument((byte) 0xc0, (byte) 0x80)));
+    assertThrows(
+        IOException.class,
+        () -> StrictJson.parse(stringDocument((byte) 0xed, (byte) 0xa0, (byte) 0x80)));
+    assertThrows(
+        IOException.class,
+        () -> StrictJson.parse(stringDocument((byte) 0xf4, (byte) 0x90, (byte) 0x80, (byte) 0x80)));
+  }
 
+  @Test
+  void rejectsUtf8ByteOrderMarks() {
+    byte[] document = {(byte) 0xef, (byte) 0xbb, (byte) 0xbf, '{', '}'};
     assertThrows(IOException.class, () -> StrictJson.parse(document));
+  }
+
+  private static byte[] stringDocument(byte... encodedValue) {
+    byte[] prefix = "{\"value\":\"".getBytes(StandardCharsets.UTF_8);
+    byte[] document = new byte[prefix.length + encodedValue.length + 2];
+    System.arraycopy(prefix, 0, document, 0, prefix.length);
+    System.arraycopy(encodedValue, 0, document, prefix.length, encodedValue.length);
+    document[document.length - 2] = '"';
+    document[document.length - 1] = '}';
+    return document;
   }
 }

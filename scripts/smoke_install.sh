@@ -71,10 +71,15 @@ cat >"$CONSUMER/src/main/java/example/Consumer.java" <<'EOF'
 package example;
 
 import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import org.missionweaveprotocol.sdk.ConformanceReport;
 import org.missionweaveprotocol.sdk.ConformanceRunner;
 import org.missionweaveprotocol.sdk.FrameCodec;
+import org.missionweaveprotocol.sdk.Principal;
 import org.missionweaveprotocol.sdk.ProtocolBundle;
+import org.missionweaveprotocol.sdk.ResolvedKey;
+import org.missionweaveprotocol.sdk.SignedDocumentCodec;
+import org.missionweaveprotocol.sdk.SignedDocumentKind;
 
 public final class Consumer {
   private Consumer() {}
@@ -100,7 +105,39 @@ public final class Consumer {
         }
         """.getBytes(StandardCharsets.UTF_8);
     new FrameCodec().decode(ping);
-    System.out.println("Installed SDK smoke passed: " + report.summary());
+
+    byte[] command;
+    try (InputStream input =
+        Consumer.class
+            .getClassLoader()
+            .getResourceAsStream("cryptography/vectors/signed-documents/valid/command.json")) {
+      if (input == null) {
+        throw new IllegalStateException("Installed JAR is missing the golden Command");
+      }
+      command = input.readAllBytes();
+    }
+    var verified =
+        new SignedDocumentCodec()
+            .verify(
+                SignedDocumentKind.COMMAND,
+                command,
+                request ->
+                    new ResolvedKey(
+                        request.keyId(),
+                        new Principal(
+                            "agent",
+                            "urn:missionweaveprotocol:agent:crypto-vector-coordinator"),
+                        "Ed25519",
+                        "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
+                        "2026-07-15T08:00:00+08:00",
+                        "2026-07-16T00:00:00Z",
+                        null));
+    if (!verified.signingHash().equals(
+        "sha256:6655c5d67ae3ecc19a4ed04bda7f1372aeaafc7adf939a77715de96ef2100695")) {
+      throw new IllegalStateException("Installed JAR failed golden Command verification");
+    }
+    System.out.println(
+        "Installed SDK smoke passed: " + report.summary() + "; " + verified.signingHash());
   }
 }
 EOF

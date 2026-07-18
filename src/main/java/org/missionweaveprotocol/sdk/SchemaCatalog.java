@@ -1,11 +1,14 @@
 package org.missionweaveprotocol.sdk;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.SchemaRegistryConfig;
-import com.networknt.schema.SpecificationVersion;
+import com.networknt.schema.dialect.Dialect;
+import com.networknt.schema.dialect.Draft202012;
+import com.networknt.schema.format.Format;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +27,28 @@ import java.util.stream.Stream;
 public final class SchemaCatalog {
   private static final String SCHEMA_PREFIX = "schemas/";
   private static final String DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema";
+  private static final Format DATE_TIME_FORMAT =
+      new Format() {
+        @Override
+        public String getName() {
+          return "date-time";
+        }
+
+        @Override
+        public String getMessageKey() {
+          return "format.date-time";
+        }
+
+        @Override
+        public boolean matches(ExecutionContext executionContext, String value) {
+          try {
+            ExactInstant.parse(value);
+            return true;
+          } catch (IllegalArgumentException error) {
+            return false;
+          }
+        }
+      };
 
   private final Map<String, Schema> schemas;
 
@@ -140,9 +165,10 @@ public final class SchemaCatalog {
 
     SchemaRegistryConfig config =
         SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
+    Dialect dialect = Dialect.builder(Draft202012.getInstance()).format(DATE_TIME_FORMAT).build();
     SchemaRegistry registry =
         SchemaRegistry.withDefaultDialect(
-            SpecificationVersion.DRAFT_2020_12,
+            dialect,
             builder ->
                 builder
                     .schemas(schemaDataById)

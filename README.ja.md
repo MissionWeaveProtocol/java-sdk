@@ -41,6 +41,7 @@ JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN
 - `FrameCodec` は汎用 MissionWeaveProtocol WebSocket フレームを厳密にデコード、検証、正規エンコードします。接続自体は作成しません。
 - `CanonicalJson` は RFC 8785 JCS と SHA-256 識別子を提供します。
 - `Ed25519`、`Base64Url`、`DocumentSignatures` は JDK Ed25519 署名、パディングなし base64url、トップレベル `signature` の除外を提供します。
+- `SignedDocumentCodec` は 6 段階の署名文書プロファイル全体を実行します。`SignedDocumentKind` と、`SigningKey` または組織管理の Agent Registry に接続する `KeyResolver` アダプターを明示的に渡します。
 - `ConformanceRunner` と `ConformanceCli` は同梱された 52 ベクトルをすべて実行します。
 
 ## クイックスタート
@@ -70,6 +71,9 @@ public final class QuickStart {
   }
 }
 ```
+
+永続的な署名対象では `SignedDocumentCodec.sign(kind, unsigned, signingKey)` と
+`verify(kind, receivedBytes, keyResolver)` を使用します。文書種別は推論されず、不変の検証証拠が返されます。
 
 ## 実行可能なサンプル
 

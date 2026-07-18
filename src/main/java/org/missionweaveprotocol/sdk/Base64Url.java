@@ -17,6 +17,9 @@ public final class Base64Url {
   /** Decode an unpadded base64url value. */
   public static byte[] decode(String value) {
     Objects.requireNonNull(value, "value");
+    if (value.isEmpty()) {
+      throw new IllegalArgumentException("Value is not unpadded base64url");
+    }
     for (int index = 0; index < value.length(); index++) {
       char character = value.charAt(index);
       boolean valid =
@@ -30,7 +33,11 @@ public final class Base64Url {
       }
     }
     try {
-      return Base64.getUrlDecoder().decode(value);
+      byte[] decoded = Base64.getUrlDecoder().decode(value);
+      if (!encode(decoded).equals(value)) {
+        throw new IllegalArgumentException("Value is not canonical unpadded base64url");
+      }
+      return decoded;
     } catch (IllegalArgumentException error) {
       throw new IllegalArgumentException("Value is not unpadded base64url", error);
     }
