@@ -79,7 +79,11 @@ def main() -> None:
         inspect(f"path:{relative_path}", relative_path, failures)
         contents = (ROOT / relative_path).read_bytes()
         if b"\0" not in contents:
-            inspect(relative_path, contents.decode("utf-8"), failures)
+            try:
+                text = contents.decode("utf-8")
+            except UnicodeDecodeError:
+                continue
+            inspect(relative_path, text, failures)
 
     if failures:
         raise SystemExit(

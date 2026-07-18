@@ -86,6 +86,7 @@
           <include>PROTOCOL_PIN.json</include>
           <include>schemas/**/*.json</include>
           <include>conformance/**/*.json</include>
+          <include>cryptography/**/*</include>
         </includes>
       </resource>
       <resource>
