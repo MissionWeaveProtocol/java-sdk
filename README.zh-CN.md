@@ -28,9 +28,9 @@
 | SDK 坐标 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | 协议版本 | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| 协议 commit | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
+| 协议 commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schema | 21 个 |
-| 符合性向量 | 43 个：22 个有效，21 个无效 |
+| 符合性向量 | 52 个：25 个有效，27 个无效 |
 
 JAR 包含完整的离线产物包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 记录其来源、文件数量和 SHA-256 树摘要。
@@ -42,7 +42,7 @@ JAR 包含完整的离线产物包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 - `FrameCodec` 严格解码、验证并规范编码通用 MissionWeaveProtocol WebSocket frame；它不创建连接。
 - `CanonicalJson` 提供 RFC 8785 JCS 和 SHA-256 标识符。
 - `Ed25519`、`Base64Url` 与 `DocumentSignatures` 提供 JDK Ed25519 签名、无填充 base64url，以及顶层 `signature` 省略。
-- `ConformanceRunner` 与 `ConformanceCli` 运行全部 43 个内置向量。
+- `ConformanceRunner` 与 `ConformanceCli` 运行全部 52 个内置向量。
 
 ## 快速开始
 
@@ -105,7 +105,7 @@ public final class QuickStart {
   exec:java
 ```
 
-内置结果为 `43/43 conformance vectors passed`。
+内置结果为 `52/52 conformance vectors passed`。
 
 ## 文档
 
@@ -117,7 +117,7 @@ public final class QuickStart {
 - Schema 验证检查文档结构和 format；它不会授予权限、认证 Agent，或证明某个动作被允许。
 - 签名辅助工具不提供密钥信任、存储、发现、吊销、时间戳策略、重放防护，也不处理 session 与 membership fencing。
 - `FrameCodec` 是序列化器，不是 transport、coordinator、worker scheduler、持久化存储、重试引擎或状态机实现。
-- `43/43` 结果仅证明 schema-and-vector conformance；它不代表互操作性、完整行为、安全性或生产就绪性。
+- `52/52` 结果仅证明 schema-and-vector conformance；它不代表互操作性、完整行为、安全性或生产就绪性。
 
 ## 开发
 

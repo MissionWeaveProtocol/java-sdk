@@ -5,19 +5,19 @@
 SDK version `0.1.0-SNAPSHOT` targets MissionWeaveProtocol `0.1` and the wire
 namespace `missionweaveprotocol`. The vendored bundle is pinned to protocol
 commit
-[`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752).
+[`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70).
 
 `PROTOCOL_PIN.json` records the authoritative source, file counts, and SHA-256
 tree digests:
 
 | Artifact | JSON files | SHA-256 |
 | --- | ---: | --- |
-| `schemas` | 21 | `cbb37b7d55ad1a21a01370d6c09677b05dcd1383d6d77fa60b9c58b0fd85c624` |
-| `conformance` | 44 | `100d2d2104d07bd7dcfbde354555a85d244f4b7c20c1c5dda0136ce36b4b8675` |
-| complete bundle | 65 | `281fb1ec9b73e07f7a2897e576dbbad021085cf7293c1e9450ba3fbdec7f2cda` |
+| `schemas` | 21 | `a225900a2c2a6c0d03de38ffa7d67dd16fd1586ca63b8ce1d019159fba5f0413` |
+| `conformance` | 53 | `21badf03fc8b05874a744a2d66d064265c635512dd49378b8d24ab1aa0e958da` |
+| complete bundle | 74 | `b5590fae29ae09e8c2ec77973405878f4dcb13d23e8acdfb888d563ec770bba7` |
 
-The 44 conformance files are one manifest plus 43 vectors: 22 expected-valid
-documents and 21 expected-invalid documents.
+The 53 conformance files are one manifest plus 52 vectors: 25 expected-valid
+documents and 27 expected-invalid documents.
 
 ## What the runner checks
 
@@ -52,7 +52,7 @@ Run a separate protocol checkout or release bundle:
 Successful output is:
 
 ```text
-43/43 conformance vectors passed
+52/52 conformance vectors passed
 ```
 
 ## Build gates
@@ -69,12 +69,12 @@ scripts/smoke_install.sh
 `verify` runs unit tests, creates the binary and source JARs, checks formatting,
 and executes integration tests against the built binary JAR. The installed
 consumer smoke test then installs `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT`
-and compiles a fresh Maven project that verifies packaged resources, runs all 43
+and compiles a fresh Maven project that verifies packaged resources, runs all 52
 vectors, and decodes a schema-valid frame.
 
 ## Deliberate limits
 
-The Java SDK claims **schema-and-vector conformance only**. A `43/43` result does
+The Java SDK claims **schema-and-vector conformance only**. A `52/52` result does
 not establish complete MissionWeaveProtocol conformance.
 
 In particular, this SDK does not by itself implement or certify:

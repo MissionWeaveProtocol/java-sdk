@@ -29,9 +29,9 @@ The official Java 21 SDK for validating, canonicalizing, signing, and testing
 | SDK coordinates | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Protocol version | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Protocol commit | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
+| Protocol commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schemas | 21 |
-| Conformance vectors | 43: 22 valid and 21 invalid |
+| Conformance vectors | 52: 25 valid and 27 invalid |
 
 The JAR contains the complete offline bundle. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 records its source, file counts, and SHA-256 tree digests.
@@ -47,7 +47,7 @@ records its source, file counts, and SHA-256 tree digests.
 - `CanonicalJson` provides RFC 8785 JCS and SHA-256 identifiers.
 - `Ed25519`, `Base64Url`, and `DocumentSignatures` provide JDK Ed25519 signing,
   unpadded base64url, and top-level `signature` omission.
-- `ConformanceRunner` and `ConformanceCli` run all 43 packaged vectors.
+- `ConformanceRunner` and `ConformanceCli` run all 52 packaged vectors.
 
 ## Quick start
 
@@ -110,7 +110,7 @@ Run the packaged vectors or a separate protocol bundle:
   exec:java
 ```
 
-The packaged result is `43/43 conformance vectors passed`.
+The packaged result is `52/52 conformance vectors passed`.
 
 ## Documentation
 
@@ -125,7 +125,7 @@ The packaged result is `43/43 conformance vectors passed`.
   timestamp policy, replay prevention, or session and membership fencing.
 - `FrameCodec` is a serializer, not a transport, coordinator, worker scheduler,
   durable store, retry engine, or state-machine implementation.
-- A `43/43` result demonstrates schema-and-vector conformance only; it does not
+- A `52/52` result demonstrates schema-and-vector conformance only; it does not
   establish interoperability, complete behavior, security, or production
   readiness.
 

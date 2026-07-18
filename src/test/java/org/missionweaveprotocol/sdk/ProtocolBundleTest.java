@@ -83,14 +83,14 @@ class ProtocolBundleTest {
     IllegalStateException error =
         assertThrows(IllegalStateException.class, () -> ProtocolBundle.verify(temporaryDirectory));
 
-    assertEquals("conformance expected 44 JSON files, found 43", error.getMessage());
+    assertEquals("conformance expected 53 JSON files, found 52", error.getMessage());
   }
 
   private static void assertVerification(ProtocolBundle.Verification verification) {
     assertEquals(ProtocolBundle.COMMIT, verification.protocolCommit());
     assertEquals(ProtocolBundle.PROTOCOL_VERSION, verification.protocolVersion());
     assertEquals(21, verification.schemaFiles());
-    assertEquals(44, verification.conformanceFiles());
+    assertEquals(53, verification.conformanceFiles());
     assertEquals(ProtocolBundle.BUNDLE_SHA256, verification.bundleSha256());
   }
 

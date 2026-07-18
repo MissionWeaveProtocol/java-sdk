@@ -27,9 +27,9 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | プロトコルバージョン | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| プロトコル commit | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
+| プロトコル commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schema | 21 |
-| 適合性ベクトル | 43：valid 22、invalid 21 |
+| 適合性ベクトル | 52：valid 25、invalid 27 |
 
 JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 に取得元、ファイル数、SHA-256 ツリーダイジェストを記録しています。
@@ -41,7 +41,7 @@ JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN
 - `FrameCodec` は汎用 MissionWeaveProtocol WebSocket frame を厳密にデコード、検証、正規エンコードします。接続自体は作成しません。
 - `CanonicalJson` は RFC 8785 JCS と SHA-256 識別子を提供します。
 - `Ed25519`、`Base64Url`、`DocumentSignatures` は JDK Ed25519 署名、パディングなし base64url、トップレベル `signature` の除外を提供します。
-- `ConformanceRunner` と `ConformanceCli` は同梱された 43 ベクトルをすべて実行します。
+- `ConformanceRunner` と `ConformanceCli` は同梱された 52 ベクトルをすべて実行します。
 
 ## クイックスタート
 
@@ -104,7 +104,7 @@ public final class QuickStart {
   exec:java
 ```
 
-同梱結果は `43/43 conformance vectors passed` です。
+同梱結果は `52/52 conformance vectors passed` です。
 
 ## ドキュメント
 
@@ -116,7 +116,7 @@ public final class QuickStart {
 - Schema 検証は文書の形状と format を確認します。権限の付与、Agent の認証、アクションの許可証明は行いません。
 - 署名ヘルパーは、鍵の信頼、保管、探索、失効、タイムスタンプポリシー、リプレイ防止、session や membership fencing を提供しません。
 - `FrameCodec` はシリアライザーであり、transport、coordinator、worker scheduler、永続ストア、再試行エンジン、状態機械の実装ではありません。
-- `43/43` は schema-and-vector conformance のみを示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
+- `52/52` は schema-and-vector conformance のみを示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
 
 ## 開発
 
