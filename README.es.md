@@ -38,8 +38,8 @@ registra su origen, el número de archivos y los resúmenes SHA-256 del árbol.
 ## Capacidades
 
 - `StrictJson` rechaza miembros de objeto duplicados, UTF-8 no válido y datos sobrantes en el límite de confianza.
-- `SchemaCatalog` compila los 21 Schema Draft 2020-12 en un registro totalmente sin conexión con las aserciones de format habilitadas.
-- `FrameCodec` decodifica, valida y codifica canónicamente frame WebSocket genéricos de MissionWeaveProtocol; no crea una conexión.
+- `SchemaCatalog` compila los 21 esquemas de JSON Schema Draft 2020-12 en un registro totalmente sin conexión con las aserciones de formato habilitadas.
+- `FrameCodec` decodifica, valida y codifica canónicamente tramas WebSocket genéricas de MissionWeaveProtocol; no crea una conexión.
 - `CanonicalJson` proporciona JCS RFC 8785 e identificadores SHA-256.
 - `Ed25519`, `Base64Url` y `DocumentSignatures` proporcionan firmas Ed25519 del JDK, base64url sin relleno y omisión del `signature` de nivel superior.
 - `ConformanceRunner` y `ConformanceCli` ejecutan los 52 vectores incluidos.
@@ -74,7 +74,7 @@ public final class QuickStart {
 
 ## Ejemplos ejecutables
 
-Los tres ejemplos del repositorio se compilan y prueban durante el proceso de build:
+Los tres ejemplos del repositorio se compilan y prueban durante el proceso de compilación:
 
 ```bash
 ./mvnw -q -Dexec.classpathScope=test \
@@ -114,9 +114,9 @@ El resultado incluido es `52/52 conformance vectors passed`.
 
 ## Límites de seguridad y comportamiento
 
-- La validación de Schema comprueba la estructura y los format del documento. No concede autoridad, no autentica un Agent ni demuestra que una acción esté permitida.
-- Los auxiliares de firma no proporcionan confianza, almacenamiento, descubrimiento o revocación de claves, política de marcas de tiempo, prevención de repetición ni fencing de session y membership.
-- `FrameCodec` es un serializador, no un transport, coordinator, worker scheduler, almacén duradero, motor de reintentos ni implementación de máquina de estados.
+- La validación de Schema comprueba la estructura y los formatos del documento. No concede autoridad, no autentica un Agent ni demuestra que una acción esté permitida.
+- Los auxiliares de firma no gestionan la confianza en las claves, su almacenamiento, descubrimiento o revocación; tampoco proporcionan políticas de marcas de tiempo, prevención de repetición ni fencing mediante Session Epoch y Membership Epoch que invalide las autoridades obsoletas.
+- `FrameCodec` es un serializador, no un transporte, coordinador, planificador de Workers, almacén duradero, motor de reintentos ni implementación de máquina de estados.
 - Un resultado `52/52` demuestra únicamente conformidad con esquemas y vectores; no establece interoperabilidad, comportamiento completo, seguridad ni preparación para producción.
 
 ## Desarrollo

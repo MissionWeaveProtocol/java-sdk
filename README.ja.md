@@ -5,7 +5,7 @@
 [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionweaveprotocol)
 0.1 データの検証、正規化、署名、テストを行う公式 Java 21 SDK です。
 
-> 適合性の表明範囲は **schema-and-vector conformance only** です。完全なランタイムプロトコル適合性は表明しません。
+> 適合性の表明範囲は **Schema とテストベクトルへの適合のみ**です。完全なランタイムプロトコル適合性は表明しません。
 
 ## 要件と依存関係
 
@@ -29,7 +29,7 @@
 | Wire namespace | `missionweaveprotocol` |
 | プロトコル commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schema | 21 |
-| 適合性ベクトル | 52：valid 25、invalid 27 |
+| 適合性ベクトル | 52：有効 25、無効 27 |
 
 JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 に取得元、ファイル数、SHA-256 ツリーダイジェストを記録しています。
@@ -38,7 +38,7 @@ JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN
 
 - `StrictJson` は信頼境界で、重複したオブジェクトメンバー、不正な UTF-8、末尾データを拒否します。
 - `SchemaCatalog` は 21 個の Draft 2020-12 Schema を、format assertion を有効にした完全オフラインのレジストリへコンパイルします。
-- `FrameCodec` は汎用 MissionWeaveProtocol WebSocket frame を厳密にデコード、検証、正規エンコードします。接続自体は作成しません。
+- `FrameCodec` は汎用 MissionWeaveProtocol WebSocket フレームを厳密にデコード、検証、正規エンコードします。接続自体は作成しません。
 - `CanonicalJson` は RFC 8785 JCS と SHA-256 識別子を提供します。
 - `Ed25519`、`Base64Url`、`DocumentSignatures` は JDK Ed25519 署名、パディングなし base64url、トップレベル `signature` の除外を提供します。
 - `ConformanceRunner` と `ConformanceCli` は同梱された 52 ベクトルをすべて実行します。
@@ -113,10 +113,10 @@ public final class QuickStart {
 
 ## セキュリティと動作上の境界
 
-- Schema 検証は文書の形状と format を確認します。権限の付与、Agent の認証、アクションの許可証明は行いません。
-- 署名ヘルパーは、鍵の信頼、保管、探索、失効、タイムスタンプポリシー、リプレイ防止、session や membership fencing を提供しません。
-- `FrameCodec` はシリアライザーであり、transport、coordinator、worker scheduler、永続ストア、再試行エンジン、状態機械の実装ではありません。
-- `52/52` は schema-and-vector conformance のみを示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
+- Schema 検証は文書構造と形式を確認します。権限の付与、Agent の認証、アクションの許可証明は行いません。
+- 署名ヘルパーは、鍵の信頼、保管、探索、失効、タイムスタンプポリシー、リプレイ防止、Session Epoch と Membership Epoch のフェンシングを提供しません。
+- `FrameCodec` はシリアライザーであり、トランスポート、Coordinator、Worker Scheduler、永続ストア、再試行エンジン、状態機械の実装ではありません。
+- `52/52` は Schema とテストベクトルへの適合のみを示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
 
 ## 開発
 
