@@ -28,9 +28,9 @@ SDK Java 21 officiel pour valider, canonicaliser, signer et tester les données
 | Coordonnées du SDK | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Version du protocole | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Commit du protocole | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
+| Commit du protocole | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schema | 21 |
-| Vecteurs de conformité | 43 : 22 valides et 21 invalides |
+| Vecteurs de conformité | 52 : 25 valides et 27 invalides |
 
 Le JAR contient le paquet hors ligne complet. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 enregistre sa provenance, le nombre de fichiers et les empreintes SHA-256 de l’arbre.
@@ -42,7 +42,7 @@ enregistre sa provenance, le nombre de fichiers et les empreintes SHA-256 de l�
 - `FrameCodec` décode, valide et encode canoniquement des frame WebSocket MissionWeaveProtocol génériques ; il ne crée pas de connexion.
 - `CanonicalJson` fournit JCS RFC 8785 et des identifiants SHA-256.
 - `Ed25519`, `Base64Url` et `DocumentSignatures` fournissent les signatures Ed25519 du JDK, base64url sans remplissage et l’omission du `signature` de premier niveau.
-- `ConformanceRunner` et `ConformanceCli` exécutent les 43 vecteurs inclus.
+- `ConformanceRunner` et `ConformanceCli` exécutent les 52 vecteurs inclus.
 
 ## Démarrage rapide
 
@@ -105,7 +105,7 @@ Exécutez les vecteurs inclus ou un paquet de protocole distinct :
   exec:java
 ```
 
-Le résultat inclus est `43/43 conformance vectors passed`.
+Le résultat inclus est `52/52 conformance vectors passed`.
 
 ## Documentation
 
@@ -117,7 +117,7 @@ Le résultat inclus est `43/43 conformance vectors passed`.
 - La validation de Schema vérifie la forme et les format du document. Elle n’accorde aucune autorité, n’authentifie pas un Agent et ne prouve pas qu’une action est autorisée.
 - Les outils de signature ne fournissent pas la confiance, le stockage, la découverte ou la révocation des clés, la politique d’horodatage, la prévention des rejeux, ni le fencing de session et de membership.
 - `FrameCodec` est un sérialiseur, pas un transport, coordinator, worker scheduler, stockage durable, moteur de nouvelle tentative ou implémentation de machine à états.
-- Un résultat `43/43` démontre uniquement une conformité limitée aux schémas et aux vecteurs ; il n’établit ni interopérabilité, ni comportement complet, ni sécurité, ni aptitude à la production.
+- Un résultat `52/52` démontre uniquement une conformité limitée aux schémas et aux vecteurs ; il n’établit ni interopérabilité, ni comportement complet, ni sécurité, ni aptitude à la production.
 
 ## Développement
 

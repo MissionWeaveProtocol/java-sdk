@@ -28,9 +28,9 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | 協定版本 | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| 協定 commit | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
+| 協定 commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schema | 21 個 |
-| 符合性向量 | 43 個：22 個有效，21 個無效 |
+| 符合性向量 | 52 個：25 個有效，27 個無效 |
 
 JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 記錄其來源、檔案數量與 SHA-256 樹狀摘要。
@@ -42,7 +42,7 @@ JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 - `FrameCodec` 嚴格解碼、驗證並正規編碼通用 MissionWeaveProtocol WebSocket frame；它不建立連線。
 - `CanonicalJson` 提供 RFC 8785 JCS 與 SHA-256 識別碼。
 - `Ed25519`、`Base64Url` 與 `DocumentSignatures` 提供 JDK Ed25519 簽署、無填補 base64url，以及頂層 `signature` 省略。
-- `ConformanceRunner` 與 `ConformanceCli` 執行全部 43 個內建向量。
+- `ConformanceRunner` 與 `ConformanceCli` 執行全部 52 個內建向量。
 
 ## 快速開始
 
@@ -105,7 +105,7 @@ public final class QuickStart {
   exec:java
 ```
 
-內建結果為 `43/43 conformance vectors passed`。
+內建結果為 `52/52 conformance vectors passed`。
 
 ## 文件
 
@@ -117,7 +117,7 @@ public final class QuickStart {
 - Schema 驗證檢查文件結構與 format；它不會授予權限、驗證 Agent 身分，或證明某個動作獲准。
 - 簽章輔助工具不提供金鑰信任、儲存、探索、撤銷、時間戳記政策、重播防護，也不處理 session 與 membership fencing。
 - `FrameCodec` 是序列化器，不是 transport、coordinator、worker scheduler、持久化儲存、重試引擎或狀態機實作。
-- `43/43` 結果僅證明 schema-and-vector conformance；它不代表互通性、完整行為、安全性或生產就緒性。
+- `52/52` 結果僅證明 schema-and-vector conformance；它不代表互通性、完整行為、安全性或生產就緒性。
 
 ## 開發
 

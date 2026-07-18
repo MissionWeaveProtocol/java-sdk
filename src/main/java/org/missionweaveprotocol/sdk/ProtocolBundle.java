@@ -29,7 +29,7 @@ public final class ProtocolBundle {
       "https://github.com/missionweaveprotocol/missionweaveprotocol";
 
   /** Exact source commit recorded by the protocol pin. */
-  public static final String COMMIT = "00964ea9064cbf1f0eca8af21a0c57367ee14752";
+  public static final String COMMIT = "6f10987627d62fb296e3490ceceb5539b1e94b70";
 
   /** Protocol version recorded by the protocol pin. */
   public static final String PROTOCOL_VERSION = "0.1";
@@ -39,15 +39,15 @@ public final class ProtocolBundle {
 
   /** SHA-256 digest of the pinned schema tree. */
   public static final String SCHEMAS_SHA256 =
-      "cbb37b7d55ad1a21a01370d6c09677b05dcd1383d6d77fa60b9c58b0fd85c624";
+      "a225900a2c2a6c0d03de38ffa7d67dd16fd1586ca63b8ce1d019159fba5f0413";
 
   /** SHA-256 digest of the pinned conformance tree. */
   public static final String CONFORMANCE_SHA256 =
-      "100d2d2104d07bd7dcfbde354555a85d244f4b7c20c1c5dda0136ce36b4b8675";
+      "21badf03fc8b05874a744a2d66d064265c635512dd49378b8d24ab1aa0e958da";
 
   /** SHA-256 digest of the complete pinned protocol bundle. */
   public static final String BUNDLE_SHA256 =
-      "281fb1ec9b73e07f7a2897e576dbbad021085cf7293c1e9450ba3fbdec7f2cda";
+      "b5590fae29ae09e8c2ec77973405878f4dcb13d23e8acdfb888d563ec770bba7";
 
   static final String PIN_RESOURCE = "PROTOCOL_PIN.json";
   static final String INDEX_RESOURCE = "META-INF/missionweaveprotocol/protocol-bundle.index";
@@ -137,7 +137,7 @@ public final class ProtocolBundle {
           "Protocol pin must define only schemas and conformance artifacts");
     }
     validateArtifact(pin.artifacts().get("schemas"), "schemas", 21, SCHEMAS_SHA256);
-    validateArtifact(pin.artifacts().get("conformance"), "conformance", 44, CONFORMANCE_SHA256);
+    validateArtifact(pin.artifacts().get("conformance"), "conformance", 53, CONFORMANCE_SHA256);
   }
 
   private static void validateArtifact(

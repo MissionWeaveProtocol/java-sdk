@@ -28,9 +28,9 @@ Das offizielle Java-21-SDK zum Validieren, Kanonisieren, Signieren und Testen vo
 | SDK-Koordinaten | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Protokollversion | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Protokoll-Commit | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
+| Protokoll-Commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schema | 21 |
-| Konformitätsvektoren | 43: 22 gültig und 21 ungültig |
+| Konformitätsvektoren | 52: 25 gültig und 27 ungültig |
 
 Das JAR enthält das vollständige Offline-Bündel. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 dokumentiert Quelle, Dateianzahlen und SHA-256-Baum-Digests.
@@ -42,7 +42,7 @@ dokumentiert Quelle, Dateianzahlen und SHA-256-Baum-Digests.
 - `FrameCodec` dekodiert, validiert und kanonisch kodiert generische MissionWeaveProtocol-WebSocket-frame; es stellt keine Verbindung her.
 - `CanonicalJson` bietet RFC 8785 JCS und SHA-256-Bezeichner.
 - `Ed25519`, `Base64Url` und `DocumentSignatures` bieten JDK-Ed25519-Signaturen, ungepolstertes base64url und das Auslassen des obersten `signature`-Feldes.
-- `ConformanceRunner` und `ConformanceCli` führen alle 43 enthaltenen Vektoren aus.
+- `ConformanceRunner` und `ConformanceCli` führen alle 52 enthaltenen Vektoren aus.
 
 ## Schnellstart
 
@@ -105,7 +105,7 @@ Führen Sie die enthaltenen Vektoren oder ein separates Protokollbündel aus:
   exec:java
 ```
 
-Das enthaltene Ergebnis lautet `43/43 conformance vectors passed`.
+Das enthaltene Ergebnis lautet `52/52 conformance vectors passed`.
 
 ## Dokumentation
 
@@ -117,7 +117,7 @@ Das enthaltene Ergebnis lautet `43/43 conformance vectors passed`.
 - Schema-Validierung prüft Dokumentform und format. Sie gewährt keine Autorität, authentifiziert keinen Agent und beweist nicht, dass eine Aktion erlaubt ist.
 - Signaturhilfen bieten weder Schlüsselvertrauen, Speicherung, Auffindung oder Widerruf noch Zeitstempelrichtlinien, Replay-Schutz oder session- und membership-fencing.
 - `FrameCodec` ist ein Serialisierer, kein transport, coordinator, worker scheduler, dauerhafter Speicher, Retry-Engine oder Zustandsmaschinenimplementierung.
-- Ein `43/43`-Ergebnis belegt nur Schema- und Vektorkonformität; es stellt keine Interoperabilität, kein vollständiges Verhalten, keine Sicherheit und keine Produktionsreife fest.
+- Ein `52/52`-Ergebnis belegt nur Schema- und Vektorkonformität; es stellt keine Interoperabilität, kein vollständiges Verhalten, keine Sicherheit und keine Produktionsreife fest.
 
 ## Entwicklung
 

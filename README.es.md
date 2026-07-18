@@ -28,9 +28,9 @@ datos de [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionw
 | Coordenadas del SDK | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Versión del protocolo | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Commit del protocolo | [`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752) |
+| Commit del protocolo | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
 | JSON Schema | 21 |
-| Vectores de conformidad | 43: 22 válidos y 21 no válidos |
+| Vectores de conformidad | 52: 25 válidos y 27 no válidos |
 
 El JAR contiene el paquete completo para uso sin conexión. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 registra su origen, el número de archivos y los resúmenes SHA-256 del árbol.
@@ -42,7 +42,7 @@ registra su origen, el número de archivos y los resúmenes SHA-256 del árbol.
 - `FrameCodec` decodifica, valida y codifica canónicamente frame WebSocket genéricos de MissionWeaveProtocol; no crea una conexión.
 - `CanonicalJson` proporciona JCS RFC 8785 e identificadores SHA-256.
 - `Ed25519`, `Base64Url` y `DocumentSignatures` proporcionan firmas Ed25519 del JDK, base64url sin relleno y omisión del `signature` de nivel superior.
-- `ConformanceRunner` y `ConformanceCli` ejecutan los 43 vectores incluidos.
+- `ConformanceRunner` y `ConformanceCli` ejecutan los 52 vectores incluidos.
 
 ## Inicio rápido
 
@@ -105,7 +105,7 @@ Ejecuta los vectores incluidos o un paquete de protocolo separado:
   exec:java
 ```
 
-El resultado incluido es `43/43 conformance vectors passed`.
+El resultado incluido es `52/52 conformance vectors passed`.
 
 ## Documentación
 
@@ -117,7 +117,7 @@ El resultado incluido es `43/43 conformance vectors passed`.
 - La validación de Schema comprueba la estructura y los format del documento. No concede autoridad, no autentica un Agent ni demuestra que una acción esté permitida.
 - Los auxiliares de firma no proporcionan confianza, almacenamiento, descubrimiento o revocación de claves, política de marcas de tiempo, prevención de repetición ni fencing de session y membership.
 - `FrameCodec` es un serializador, no un transport, coordinator, worker scheduler, almacén duradero, motor de reintentos ni implementación de máquina de estados.
-- Un resultado `43/43` demuestra únicamente conformidad con esquemas y vectores; no establece interoperabilidad, comportamiento completo, seguridad ni preparación para producción.
+- Un resultado `52/52` demuestra únicamente conformidad con esquemas y vectores; no establece interoperabilidad, comportamiento completo, seguridad ni preparación para producción.
 
 ## Desarrollo
 
