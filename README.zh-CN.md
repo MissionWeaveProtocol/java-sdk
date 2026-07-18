@@ -6,7 +6,7 @@
 [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionweaveprotocol)
 0.1 数据的官方 Java 21 SDK。
 
-> 符合性声明：仅限 **schema-and-vector conformance only**。本 SDK 不声明完整的运行时协议符合性。
+> 符合性声明：**仅限 Schema 与测试向量符合性**。本 SDK 不声明完整的运行时协议符合性。
 
 ## 要求与依赖
 

@@ -74,7 +74,7 @@ public final class QuickStart {
 
 ## Ejemplos ejecutables
 
-La compilación compila y prueba los tres ejemplos del repositorio:
+Los tres ejemplos del repositorio se compilan y prueban durante el proceso de build:
 
 ```bash
 ./mvnw -q -Dexec.classpathScope=test \
