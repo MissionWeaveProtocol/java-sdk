@@ -87,6 +87,28 @@ These helpers do not decide whether a key is trusted, current, authorized, or
 revoked. Applications remain responsible for key discovery, storage, policy,
 replay prevention, fencing, and timestamp checks.
 
+## Six-stage Signed Document codec
+
+`SignedDocumentCodec` implements the protocol-owned six cryptographic stages for the fixed nine
+Signed Document kinds. Callers must select a `SignedDocumentKind`; the codec never infers it.
+
+```java
+SignedDocumentCodec codec = new SignedDocumentCodec();
+var signed = codec.sign(SignedDocumentKind.COMMAND, unsignedCommand, signingKey);
+VerifiedSignedDocument verified =
+    codec.verify(SignedDocumentKind.COMMAND, receivedBytes, keyResolver);
+```
+
+`SigningKey` and `KeyResolver` are the only external adapters. The Organization-controlled
+resolver must fail closed unless it can establish immutable key-ID bindings, Organization-wide
+public-key and tuple uniqueness, and append-only validity history. A successful result retains an
+immutable parsed document, received bytes, signing and complete canonical bytes and hashes,
+protected-time text and exact instant, signature material, and the resolved key and Principal.
+
+Failures expose only the non-oracular wire code through `wireCode()`. Store the stage and specific
+reason from `diagnostic()` only in access-controlled audit storage. The codec deliberately excludes
+First-Admission Record, freshness, replay, and authorization checks.
+
 ## Generic WebSocket frames
 
 `FrameCodec` validates generic JSON objects against

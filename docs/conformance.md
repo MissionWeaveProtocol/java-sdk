@@ -19,6 +19,9 @@ tree digests:
 The 53 conformance files are one manifest plus 52 vectors: 25 expected-valid
 documents and 27 expected-invalid documents.
 
+The independently pinned cryptography bundle adds nine Signed Document profiles, 22 cases, and 58
+evaluations: 12 complete and 46 rejected at their first normative semantic stage.
+
 ## What the runner checks
 
 `SchemaCatalog` and `ConformanceRunner` provide the current conformance layer:
@@ -29,6 +32,8 @@ documents and 27 expected-invalid documents.
 - the validator does not enable remote schema fetching;
 - JSON Schema format assertions are enabled;
 - each manifest entry is checked against its named schema and expected validity;
+- `SignedDocumentCodec` is exercised against all 58 cryptography evaluations, including strict
+  Ed25519 point/scalar encodings, exact timestamps, Registry validity, JCS bytes, and hashes;
 - the source tree, compiled classpath, built JAR, and installed Maven consumer
   are exercised independently.
 
@@ -74,7 +79,8 @@ vectors, and decodes a schema-valid frame.
 
 ## Deliberate limits
 
-The Java SDK claims **schema-and-vector conformance only**. A `52/52` result does
+The Java SDK claims **schema-and-vector conformance only**. A `52/52` schema result plus all 58
+cryptography evaluations does
 not establish complete MissionWeaveProtocol conformance.
 
 In particular, this SDK does not by itself implement or certify:

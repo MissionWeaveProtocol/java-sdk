@@ -42,6 +42,7 @@ registra su origen, el número de archivos y los resúmenes SHA-256 del árbol.
 - `FrameCodec` decodifica, valida y codifica canónicamente tramas WebSocket genéricas de MissionWeaveProtocol; no crea una conexión.
 - `CanonicalJson` proporciona JCS RFC 8785 e identificadores SHA-256.
 - `Ed25519`, `Base64Url` y `DocumentSignatures` proporcionan firmas Ed25519 del JDK, base64url sin relleno y omisión del `signature` de nivel superior.
+- `SignedDocumentCodec` ejecuta el perfil completo de documento firmado en seis etapas; recibe un `SignedDocumentKind` explícito, un `SigningKey` o un adaptador `KeyResolver` para un Agent Registry controlado por la organización.
 - `ConformanceRunner` y `ConformanceCli` ejecutan los 52 vectores incluidos.
 
 ## Inicio rápido
@@ -71,6 +72,9 @@ public final class QuickStart {
   }
 }
 ```
+
+Para objetos firmados duraderos, usa `SignedDocumentCodec.sign(kind, unsigned, signingKey)` y
+`verify(kind, receivedBytes, keyResolver)`; el códec no infiere el tipo y devuelve evidencia de verificación inmutable.
 
 ## Ejemplos ejecutables
 

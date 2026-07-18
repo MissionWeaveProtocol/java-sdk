@@ -47,6 +47,9 @@ records its source, file counts, and SHA-256 tree digests.
 - `CanonicalJson` provides RFC 8785 JCS and SHA-256 identifiers.
 - `Ed25519`, `Base64Url`, and `DocumentSignatures` provide JDK Ed25519 signing,
   unpadded base64url, and top-level `signature` omission.
+- `SignedDocumentCodec` applies the complete six-stage Signed Document profile; pass an explicit
+  `SignedDocumentKind` plus your `SigningKey` or a `KeyResolver` adapter for an
+  Organization-controlled Agent Registry.
 - `ConformanceRunner` and `ConformanceCli` run all 52 packaged vectors.
 
 ## Quick start
@@ -76,6 +79,10 @@ public final class QuickStart {
   }
 }
 ```
+
+For durable signed objects, call `SignedDocumentCodec.sign(kind, unsigned, signingKey)` and
+`verify(kind, receivedBytes, keyResolver)`. The codec never infers the kind and returns immutable
+verification evidence including received, signing, and complete canonical bytes and hashes.
 
 ## Runnable examples
 

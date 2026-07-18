@@ -35,6 +35,24 @@ class SchemaCatalogTest {
   }
 
   @Test
+  void acceptsTheFullRfc3339TimestampProfile() throws IOException {
+    SchemaCatalog catalog = SchemaCatalog.packaged();
+    String valid =
+        new String(resource("conformance/vectors/valid/command.json"), StandardCharsets.UTF_8);
+    byte[] lowercaseTime =
+        valid
+            .replace("2026-07-15T00:00:00Z", "2026-07-15t00:00:00Z")
+            .getBytes(StandardCharsets.UTF_8);
+    byte[] arbitraryPrecisionTime =
+        valid
+            .replace("2026-07-15T00:00:00Z", "2026-07-15T00:00:00.1234560000000000001Z")
+            .getBytes(StandardCharsets.UTF_8);
+
+    catalog.validate("command.schema.json", lowercaseTime);
+    catalog.validate("command.schema.json", arbitraryPrecisionTime);
+  }
+
+  @Test
   void usesStrictJsonForInputDocuments() throws IOException {
     SchemaCatalog catalog = SchemaCatalog.packaged();
 

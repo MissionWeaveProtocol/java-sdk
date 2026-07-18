@@ -42,6 +42,7 @@ JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 - `FrameCodec` 嚴格解碼、驗證並正規編碼通用 MissionWeaveProtocol WebSocket 訊框；它不建立連線。
 - `CanonicalJson` 提供 RFC 8785 JCS 與 SHA-256 識別碼。
 - `Ed25519`、`Base64Url` 與 `DocumentSignatures` 提供 JDK Ed25519 簽署、無填補 base64url，以及頂層 `signature` 省略。
+- `SignedDocumentCodec` 執行完整的六階段簽章文件流程；請明確傳入 `SignedDocumentKind`，並提供 `SigningKey`，或連接組織控制之 Agent Registry 的 `KeyResolver` 轉接器。
 - `ConformanceRunner` 與 `ConformanceCli` 執行全部 52 個內建向量。
 
 ## 快速開始
@@ -71,6 +72,9 @@ public final class QuickStart {
   }
 }
 ```
+
+對持久化簽章物件，請呼叫 `SignedDocumentCodec.sign(kind, unsigned, signingKey)` 與
+`verify(kind, receivedBytes, keyResolver)`；編解碼器不會推斷文件種類，並回傳不可變的驗章證據。
 
 ## 可執行範例
 
