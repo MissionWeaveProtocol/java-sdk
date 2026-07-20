@@ -52,16 +52,16 @@ final class AgentRegistryKeyResolution {
         binding.mergeHistory(candidate);
       }
 
-      KeyOwner owner = new KeyOwner(candidate.keyId, candidate.principal);
-      KeyOwner previousOwner = publicKeyOwners.putIfAbsent(candidate.publicKey, owner);
-      if (previousOwner != null && !previousOwner.equals(owner)) {
-        throw new IllegalArgumentException("Registry reuses a public key");
-      }
-
       KeyTuple tuple = new KeyTuple(candidate.principal, candidate.algorithm, candidate.publicKey);
       String previousId = tupleIds.putIfAbsent(tuple, candidate.keyId);
       if (previousId != null && !previousId.equals(candidate.keyId)) {
         throw new IllegalArgumentException("Registry contains a key-ID alias");
+      }
+
+      KeyOwner owner = new KeyOwner(candidate.keyId, candidate.principal);
+      KeyOwner previousOwner = publicKeyOwners.putIfAbsent(candidate.publicKey, owner);
+      if (previousOwner != null && !previousOwner.equals(owner)) {
+        throw new IllegalArgumentException("Registry reuses a public key");
       }
     }
 
