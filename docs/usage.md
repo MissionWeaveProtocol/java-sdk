@@ -93,21 +93,55 @@ replay prevention, fencing, and timestamp checks.
 Signed Document kinds. Callers must select a `SignedDocumentKind`; the codec never infers it.
 
 ```java
+import java.nio.file.Files;
+import java.nio.file.Path;
+import org.missionweaveprotocol.sdk.KeyRegistrySnapshot;
+import org.missionweaveprotocol.sdk.KeyResolver;
+import org.missionweaveprotocol.sdk.SignedDocumentCodec;
+import org.missionweaveprotocol.sdk.SignedDocumentKind;
+import org.missionweaveprotocol.sdk.VerifiedSignedDocument;
+
+byte[] registryBytes = Files.readAllBytes(Path.of("agent-registry.json"));
+byte[] receivedBytes = Files.readAllBytes(Path.of("command.json"));
+KeyResolver keyResolver =
+    request -> KeyRegistrySnapshot.organizationWide(registryBytes);
+
 SignedDocumentCodec codec = new SignedDocumentCodec();
-var signed = codec.sign(SignedDocumentKind.COMMAND, unsignedCommand, signingKey);
 VerifiedSignedDocument verified =
     codec.verify(SignedDocumentKind.COMMAND, receivedBytes, keyResolver);
+String organizationId = verified.resolvedKey().organizationId();
 ```
 
-`SigningKey` and `KeyResolver` are the only external adapters. The Organization-controlled
-resolver must fail closed unless it can establish immutable key-ID bindings, Organization-wide
-public-key and tuple uniqueness, and append-only validity history. A successful result retains an
-immutable parsed document, received bytes, signing and complete canonical bytes and hashes,
-protected-time text and exact instant, signature material, and the resolved key and Principal.
+`SigningKey` and `KeyResolver` are the only external adapters. Calling
+`KeyRegistrySnapshot.organizationWide(registryBytes)` is a trusted adapter assertion, not proof
+that the bytes are complete. Before making that assertion, the adapter must establish that the
+evidence is scoped to one Organization-controlled Agent Registry and represents one coherent,
+authoritative revision that is current or explicitly applicable to the verification decision,
+with Organization-wide bindings and complete retained history. Every request field, including
+`request.keyId()`, is routing and observability context only; it must not be used to filter or
+project the Registry.
+
+The Registry bytes remain untrusted. The codec strictly parses them, validates every binding and
+the complete retained history, enforces global no-reuse and no-alias invariants, and only then
+selects the requested key. The JSON bytes inside `KeyRegistrySnapshot` are a Java-SDK-local
+evidence representation, not a standardized MissionWeaveProtocol Registry wire artifact. A null
+snapshot, `PARTIAL` or `UNSPECIFIED` completeness, empty bytes, unavailable evidence, or malformed
+evidence fails closed at key resolution. Acquisition adapters report unavailability or adaptation
+failures with the checked `KeyResolutionException`.
+
+A successful result retains an immutable parsed document, received bytes, signing and complete
+canonical bytes and hashes, protected-time text and exact instant, signature material, and the
+resolved key and Principal. The codec-produced `ResolvedKey` also retains the Registry
+`organizationId`.
 
 Failures expose only the non-oracular wire code through `wireCode()`. Store the stage and specific
 reason from `diagnostic()` only in access-controlled audit storage. The codec deliberately excludes
 First-Admission Record, freshness, replay, and authorization checks.
+
+### Migration from earlier `0.1.0-SNAPSHOT` builds
+
+`KeyResolver` now returns `KeyRegistrySnapshot`, not `ResolvedKey`. The `ResolvedKey` record now
+begins with `organizationId`, and there is no legacy overload or selected-key resolver adapter.
 
 ## Generic WebSocket frames
 

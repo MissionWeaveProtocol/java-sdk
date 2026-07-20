@@ -42,7 +42,18 @@ JAR 包含完整的离线产物包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 - `FrameCodec` 严格解码、验证并规范编码通用 MissionWeaveProtocol WebSocket 帧；它不创建连接。
 - `CanonicalJson` 提供 RFC 8785 JCS 和 SHA-256 标识符。
 - `Ed25519`、`Base64Url` 与 `DocumentSignatures` 提供 JDK Ed25519 签名、无填充 base64url，以及顶层 `signature` 省略。
-- `SignedDocumentCodec` 执行完整的六阶段签名文档流程；显式传入 `SignedDocumentKind`，并提供 `SigningKey`，或连接组织控制的 Agent Registry 的 `KeyResolver` 适配器。
+- `SignedDocumentCodec` 执行完整的六阶段签名文档流程。`KeyResolver` 接收
+  `KeyResolutionRequest`，并返回通过 `KeyRegistrySnapshot.organizationWide(registryBytes)`
+  创建、包含完整 Registry 字节的 `KeyRegistrySnapshot`，而不是已选定的 `ResolvedKey`。
+- `ORGANIZATION_WIDE` 是受信任适配器作出的断言，而不是完整性证明。它表示这些字节
+  代表由组织控制的单个 Agent Registry 的一个自洽、权威且适用于本次验证决策的 Registry
+  修订版本，并涵盖组织范围内的全部密钥绑定和完整留存的有效性历史记录。
+  `request.keyId()` 仅提供路由上下文，不得用于筛选 Registry 或只返回局部投影。
+- 编解码器将这些字节视为不受信任的数据；它先验证每个密钥绑定、全局不得复用密钥或
+  建立别名的约束，以及完整的有效性历史记录，再选择密钥。`KeyRegistrySnapshot` 为 `null`、
+  完整性为 `PARTIAL` 或 `UNSPECIFIED`，或 Registry 证据为空、不可用或格式错误时，
+  均会在密钥解析阶段安全拒绝（fail closed）。编解码器生成的 `ResolvedKey` 会保留
+  Registry 的 `organizationId`。
 - `ConformanceRunner` 与 `ConformanceCli` 运行全部 56 个内置向量。
 
 ## 快速开始
@@ -74,7 +85,8 @@ public final class QuickStart {
 ```
 
 对于持久化签名对象，调用 `SignedDocumentCodec.sign(kind, unsigned, signingKey)` 与
-`verify(kind, receivedBytes, keyResolver)`；编解码器不会推断文档种类，并返回不可变的验签证据。
+`verify(kind, receivedBytes, keyResolver)`；编解码器不会推断文档种类，并返回不可变的
+验签证据，包括接收的原始字节、签名输入字节及其哈希，以及完整文档的规范字节及其哈希。
 
 ## 可运行示例
 
