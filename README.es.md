@@ -28,9 +28,9 @@ datos de [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionw
 | Coordenadas del SDK | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Versión del protocolo | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Commit del protocolo | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
+| Commit del protocolo | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
 | JSON Schema | 21 |
-| Vectores de conformidad | 52: 25 válidos y 27 no válidos |
+| Vectores de conformidad | 56: 26 válidos y 30 no válidos |
 
 El JAR contiene el paquete completo para uso sin conexión. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 registra su origen, el número de archivos y los resúmenes SHA-256 del árbol.
@@ -43,7 +43,7 @@ registra su origen, el número de archivos y los resúmenes SHA-256 del árbol.
 - `CanonicalJson` proporciona JCS RFC 8785 e identificadores SHA-256.
 - `Ed25519`, `Base64Url` y `DocumentSignatures` proporcionan firmas Ed25519 del JDK, base64url sin relleno y omisión del `signature` de nivel superior.
 - `SignedDocumentCodec` ejecuta el perfil completo de documento firmado en seis etapas; recibe un `SignedDocumentKind` explícito, un `SigningKey` o un adaptador `KeyResolver` para un Agent Registry controlado por la organización.
-- `ConformanceRunner` y `ConformanceCli` ejecutan los 52 vectores incluidos.
+- `ConformanceRunner` y `ConformanceCli` ejecutan los 56 vectores incluidos.
 
 ## Inicio rápido
 
@@ -109,7 +109,7 @@ Ejecuta los vectores incluidos o un paquete de protocolo separado:
   exec:java
 ```
 
-El resultado incluido es `52/52 conformance vectors passed`.
+El resultado incluido es `56/56 conformance vectors passed`.
 
 ## Documentación
 
@@ -121,7 +121,7 @@ El resultado incluido es `52/52 conformance vectors passed`.
 - La validación de Schema comprueba la estructura y los formatos del documento. No concede autoridad, no autentica un Agent ni demuestra que una acción esté permitida.
 - Los auxiliares de firma no gestionan la confianza en las claves, su almacenamiento, descubrimiento o revocación; tampoco proporcionan políticas de marcas de tiempo, prevención de repetición ni fencing mediante Session Epoch y Membership Epoch que invalide las autoridades obsoletas.
 - `FrameCodec` es un serializador, no un transporte, coordinador, planificador de Workers, almacén duradero, motor de reintentos ni implementación de máquina de estados.
-- Un resultado `52/52` demuestra únicamente conformidad con esquemas y vectores; no establece interoperabilidad, comportamiento completo, seguridad ni preparación para producción.
+- Un resultado `56/56` demuestra únicamente conformidad con esquemas y vectores; no establece interoperabilidad, comportamiento completo, seguridad ni preparación para producción.
 
 ## Desarrollo
 

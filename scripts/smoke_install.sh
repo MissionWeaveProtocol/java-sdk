@@ -86,12 +86,12 @@ public final class Consumer {
 
   public static void main(String[] arguments) throws Exception {
     var bundle = ProtocolBundle.verifyPackaged();
-    if (bundle.schemaFiles() != 21 || bundle.conformanceFiles() != 53) {
+    if (bundle.schemaFiles() != 21 || bundle.conformanceFiles() != 57) {
       throw new IllegalStateException("Installed protocol bundle is incomplete");
     }
 
     ConformanceReport report = ConformanceRunner.runPackaged();
-    if (!report.passed() || report.results().size() != 52) {
+    if (!report.passed() || report.results().size() != 56) {
       throw new IllegalStateException(report.summary());
     }
 

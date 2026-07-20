@@ -25,7 +25,7 @@ class ProtocolImplementationPackagingIT {
       SchemaCatalog catalog = SchemaCatalog.packaged(loader);
       ConformanceReport report = ConformanceRunner.runPackaged(loader);
       assertEquals(21, catalog.schemaNames().size());
-      assertEquals("52/52 conformance vectors passed", report.summary());
+      assertEquals("56/56 conformance vectors passed", report.summary());
       assertTrue(report.passed());
 
       try (InputStream input =

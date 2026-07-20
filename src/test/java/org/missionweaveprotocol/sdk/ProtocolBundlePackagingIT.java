@@ -47,7 +47,7 @@ class ProtocolBundlePackagingIT {
                           && name.endsWith(".json"))
               .sorted()
               .toList();
-      assertEquals(74, protocolEntries.size());
+      assertEquals(78, protocolEntries.size());
       assertEquals(Set.copyOf(ProtocolBundle.resourcePaths(loader)), Set.copyOf(protocolEntries));
 
       for (String path : protocolEntries) {

@@ -223,7 +223,7 @@ class SignedDocumentCodecTest {
   }
 
   @Test
-  void checksTheCompleteReceivedDocumentJcsDomainBeforeSignatureVerification() throws Exception {
+  void rejectsNonAsciiKeyIdentifiersDuringSchemaValidation() throws Exception {
     String received =
         new String(
                 resource("cryptography/vectors/signed-documents/valid/command.json"),
@@ -255,9 +255,9 @@ class SignedDocumentCodecTest {
                         received.getBytes(StandardCharsets.UTF_8),
                         resolver));
 
-    assertEquals(VerificationStage.CANONICALIZATION, error.diagnostic().stage());
-    assertEquals("PROTOCOL_VIOLATION", error.wireCode());
-    assertEquals(true, resolved.get());
+    assertEquals(VerificationStage.SCHEMA, error.diagnostic().stage());
+    assertEquals("SCHEMA_VALIDATION_FAILED", error.wireCode());
+    assertFalse(resolved.get());
   }
 
   @Test
