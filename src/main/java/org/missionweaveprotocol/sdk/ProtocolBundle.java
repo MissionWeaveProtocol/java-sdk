@@ -34,7 +34,7 @@ public final class ProtocolBundle {
       "https://github.com/missionweaveprotocol/missionweaveprotocol";
 
   /** Exact source commit recorded by the protocol pin. */
-  public static final String COMMIT = "6f10987627d62fb296e3490ceceb5539b1e94b70";
+  public static final String COMMIT = "33e47ad8a7318f942de77fb72dbb054d85881b40";
 
   /** Protocol version recorded by the protocol pin. */
   public static final String PROTOCOL_VERSION = "0.1";
@@ -44,15 +44,15 @@ public final class ProtocolBundle {
 
   /** SHA-256 digest of the pinned schema tree. */
   public static final String SCHEMAS_SHA256 =
-      "a225900a2c2a6c0d03de38ffa7d67dd16fd1586ca63b8ce1d019159fba5f0413";
+      "de90adb6a84995ce6e7e35f20c58f74293546ad2aca61796429c8b1d8d269c42";
 
   /** SHA-256 digest of the pinned conformance tree. */
   public static final String CONFORMANCE_SHA256 =
-      "21badf03fc8b05874a744a2d66d064265c635512dd49378b8d24ab1aa0e958da";
+      "fc7d6b2005b4cdebcb9d47efd0a3ce991fea111776c4271beaf8945e11b5d7df";
 
   /** SHA-256 digest of the complete pinned protocol bundle. */
   public static final String BUNDLE_SHA256 =
-      "b5590fae29ae09e8c2ec77973405878f4dcb13d23e8acdfb888d563ec770bba7";
+      "eed30aeb0a6d39575b6ab2f3121de27cef34d27dd9659ee4e5a7204ec5deeea7";
 
   /** Pinned signed-document cryptography manifest path. */
   public static final String CRYPTOGRAPHY_PATH = "cryptography/manifest.json";
@@ -70,7 +70,7 @@ public final class ProtocolBundle {
 
   /** Artifact digest of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_ARTIFACT_DIGEST =
-      "sha256:487e18c1ea7053432953f28d1496ae4fdb8e9d42c2eeb8e94f9b21f8cc2596a2";
+      "sha256:159a4900987723537d0d110ec6724c5e1ee52854951a9c69278386d751baae08";
 
   /** Number of digest-protected artifacts in the cryptography manifest. */
   public static final int CRYPTOGRAPHY_ARTIFACT_COUNT = 94;
@@ -224,7 +224,7 @@ public final class ProtocolBundle {
           "Protocol pin must define only schemas and conformance artifacts");
     }
     validateArtifact(pin.artifacts().get("schemas"), "schemas", 21, SCHEMAS_SHA256);
-    validateArtifact(pin.artifacts().get("conformance"), "conformance", 53, CONFORMANCE_SHA256);
+    validateArtifact(pin.artifacts().get("conformance"), "conformance", 57, CONFORMANCE_SHA256);
   }
 
   private static void validateCryptographyPin(Pin pin) {

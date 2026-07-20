@@ -169,7 +169,7 @@ Or point it at a protocol repository or release-bundle root:
   exec:java
 ```
 
-The expected bundled result is `52/52 conformance vectors passed`.
+The expected bundled result is `56/56 conformance vectors passed`.
 
 ## Runnable examples
 

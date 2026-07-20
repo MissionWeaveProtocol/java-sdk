@@ -9,6 +9,7 @@ import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.dialect.Dialect;
 import com.networknt.schema.dialect.Draft202012;
 import com.networknt.schema.format.Format;
+import com.networknt.schema.format.UriFormat;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +48,30 @@ public final class SchemaCatalog {
           } catch (IllegalArgumentException error) {
             return false;
           }
+        }
+      };
+  private static final Format STANDARD_URI_FORMAT = new UriFormat();
+  private static final Format URI_FORMAT =
+      new Format() {
+        @Override
+        public String getName() {
+          return "uri";
+        }
+
+        @Override
+        public String getMessageKey() {
+          return "format.uri";
+        }
+
+        @Override
+        public boolean matches(ExecutionContext executionContext, String value) {
+          if (!isVisibleAscii(value)) {
+            return false;
+          }
+          if (value.matches("[A-Za-z][A-Za-z0-9+.-]*:")) {
+            return true;
+          }
+          return STANDARD_URI_FORMAT.matches(executionContext, value);
         }
       };
 
@@ -165,7 +190,11 @@ public final class SchemaCatalog {
 
     SchemaRegistryConfig config =
         SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
-    Dialect dialect = Dialect.builder(Draft202012.getInstance()).format(DATE_TIME_FORMAT).build();
+    Dialect dialect =
+        Dialect.builder(Draft202012.getInstance())
+            .format(DATE_TIME_FORMAT)
+            .format(URI_FORMAT)
+            .build();
     SchemaRegistry registry =
         SchemaRegistry.withDefaultDialect(
             dialect,
@@ -195,5 +224,18 @@ public final class SchemaCatalog {
       throw new IllegalArgumentException("Invalid schema name: " + schemaName);
     }
     return name;
+  }
+
+  private static boolean isVisibleAscii(String value) {
+    if (value.isEmpty()) {
+      return false;
+    }
+    for (int index = 0; index < value.length(); index++) {
+      char character = value.charAt(index);
+      if (character < 0x21 || character > 0x7e) {
+        return false;
+      }
+    }
+    return true;
   }
 }

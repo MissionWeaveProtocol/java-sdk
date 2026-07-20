@@ -4,6 +4,9 @@ conformance/vectors/invalid/agent-command-missing-membership-epoch.json
 conformance/vectors/invalid/agent-command-missing-session-epoch.json
 conformance/vectors/invalid/approval-final-by-agent.json
 conformance/vectors/invalid/artifact-with-inline-content.json
+conformance/vectors/invalid/command-action-id-iri-only.json
+conformance/vectors/invalid/command-action-id-relative-reference.json
+conformance/vectors/invalid/command-action-id-trailing-line-feed.json
 conformance/vectors/invalid/command-missing-signature.json
 conformance/vectors/invalid/context-package-without-event-provenance.json
 conformance/vectors/invalid/conversation-work-item-without-primary.json
@@ -31,6 +34,7 @@ conformance/vectors/valid/approval.json
 conformance/vectors/valid/artifact.json
 conformance/vectors/valid/child-approval.json
 conformance/vectors/valid/child-mission.json
+conformance/vectors/valid/command-action-id-empty-hier-part.json
 conformance/vectors/valid/command.json
 conformance/vectors/valid/context-package.json
 conformance/vectors/valid/conversation.json

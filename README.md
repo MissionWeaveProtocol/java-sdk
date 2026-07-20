@@ -29,9 +29,9 @@ The official Java 21 SDK for validating, canonicalizing, signing, and testing
 | SDK coordinates | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Protocol version | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Protocol commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
+| Protocol commit | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
 | JSON Schemas | 21 |
-| Conformance vectors | 52: 25 valid and 27 invalid |
+| Conformance vectors | 56: 26 valid and 30 invalid |
 
 The JAR contains the complete offline bundle. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 records its source, file counts, and SHA-256 tree digests.
@@ -50,7 +50,7 @@ records its source, file counts, and SHA-256 tree digests.
 - `SignedDocumentCodec` applies the complete six-stage Signed Document profile; pass an explicit
   `SignedDocumentKind` plus your `SigningKey` or a `KeyResolver` adapter for an
   Organization-controlled Agent Registry.
-- `ConformanceRunner` and `ConformanceCli` run all 52 packaged vectors.
+- `ConformanceRunner` and `ConformanceCli` run all 56 packaged vectors.
 
 ## Quick start
 
@@ -117,7 +117,7 @@ Run the packaged vectors or a separate protocol bundle:
   exec:java
 ```
 
-The packaged result is `52/52 conformance vectors passed`.
+The packaged result is `56/56 conformance vectors passed`.
 
 ## Documentation
 
@@ -132,7 +132,7 @@ The packaged result is `52/52 conformance vectors passed`.
   timestamp policy, replay prevention, or session and membership fencing.
 - `FrameCodec` is a serializer, not a transport, coordinator, worker scheduler,
   durable store, retry engine, or state-machine implementation.
-- A `52/52` result demonstrates schema-and-vector conformance only; it does not
+- A `56/56` result demonstrates schema-and-vector conformance only; it does not
   establish interoperability, complete behavior, security, or production
   readiness.
 

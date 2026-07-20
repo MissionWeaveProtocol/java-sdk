@@ -27,9 +27,9 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | プロトコルバージョン | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| プロトコル commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
+| プロトコル commit | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
 | JSON Schema | 21 |
-| 適合性ベクトル | 52：有効 25、無効 27 |
+| 適合性ベクトル | 56：有効 26、無効 30 |
 
 JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 に取得元、ファイル数、SHA-256 ツリーダイジェストを記録しています。
@@ -42,7 +42,7 @@ JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN
 - `CanonicalJson` は RFC 8785 JCS と SHA-256 識別子を提供します。
 - `Ed25519`、`Base64Url`、`DocumentSignatures` は JDK Ed25519 署名、パディングなし base64url、トップレベル `signature` の除外を提供します。
 - `SignedDocumentCodec` は 6 段階の署名文書プロファイル全体を実行します。`SignedDocumentKind` と、`SigningKey` または組織管理の Agent Registry に接続する `KeyResolver` アダプターを明示的に渡します。
-- `ConformanceRunner` と `ConformanceCli` は同梱された 52 ベクトルをすべて実行します。
+- `ConformanceRunner` と `ConformanceCli` は同梱された 56 ベクトルをすべて実行します。
 
 ## クイックスタート
 
@@ -108,7 +108,7 @@ public final class QuickStart {
   exec:java
 ```
 
-同梱結果は `52/52 conformance vectors passed` です。
+同梱結果は `56/56 conformance vectors passed` です。
 
 ## ドキュメント
 
@@ -120,7 +120,7 @@ public final class QuickStart {
 - Schema 検証は文書構造と形式を確認します。権限の付与、Agent の認証、アクションの許可証明は行いません。
 - 署名ヘルパーは、鍵の信頼、保管、探索、失効、タイムスタンプポリシー、リプレイ防止、Session Epoch と Membership Epoch のフェンシングを提供しません。
 - `FrameCodec` はシリアライザーであり、トランスポート、Coordinator、Worker Scheduler、永続ストア、再試行エンジン、状態機械の実装ではありません。
-- `52/52` は Schema とテストベクトルへの適合のみを示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
+- `56/56` は Schema とテストベクトルへの適合のみを示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
 
 ## 開発
 

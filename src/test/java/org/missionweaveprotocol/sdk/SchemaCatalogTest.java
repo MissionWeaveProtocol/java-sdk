@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,6 +55,48 @@ class SchemaCatalogTest {
   }
 
   @Test
+  void enforcesAbsoluteAsciiUriIdentifiers() throws IOException {
+    SchemaCatalog catalog = SchemaCatalog.packaged();
+    byte[] command = resource("conformance/vectors/valid/command.json");
+
+    catalog.validate("command.schema.json", commandWithActionId(command, "example:"));
+    catalog.validate(
+        "command.schema.json",
+        commandWithActionId(command, "https://example.test/actions/%E4%BE%8B"));
+    catalog.validate(
+        "command.schema.json", commandWithActionId(command, "https://example.test/?q=%5Bx%5D"));
+
+    assertThrows(
+        SchemaValidationException.class,
+        () ->
+            catalog.validate(
+                "command.schema.json",
+                commandWithActionId(command, "https://example.test/?q=[x]")));
+    for (String invalidActionId :
+        new String[] {"example:%", "example:%Z", "example:%ZZ", "https://example.test/?q=%GG"}) {
+      assertThrows(
+          SchemaValidationException.class,
+          () ->
+              catalog.validate(
+                  "command.schema.json", commandWithActionId(command, invalidActionId)));
+    }
+
+    assertThrows(
+        SchemaValidationException.class,
+        () -> catalog.validate("command.schema.json", commandWithActionId(command, "actions/run")));
+    assertThrows(
+        SchemaValidationException.class,
+        () ->
+            catalog.validate(
+                "command.schema.json", commandWithActionId(command, "urn:example:action\n")));
+    assertThrows(
+        SchemaValidationException.class,
+        () ->
+            catalog.validate(
+                "command.schema.json", commandWithActionId(command, "https://例え.テスト/actions/run")));
+  }
+
+  @Test
   void usesStrictJsonForInputDocuments() throws IOException {
     SchemaCatalog catalog = SchemaCatalog.packaged();
 
@@ -95,5 +139,11 @@ class SchemaCatalogTest {
       }
       return input.readAllBytes();
     }
+  }
+
+  private static JsonNode commandWithActionId(byte[] source, String actionId) throws IOException {
+    JsonNode parsed = StrictJson.parse(source);
+    ((ObjectNode) parsed).put("actionId", actionId);
+    return parsed;
   }
 }

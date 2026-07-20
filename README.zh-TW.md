@@ -28,9 +28,9 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | 協定版本 | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| 協定 commit | [`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70) |
+| 協定 commit | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
 | JSON Schema | 21 個 |
-| 符合性向量 | 52 個：25 個有效，27 個無效 |
+| 符合性向量 | 56 個：26 個有效，30 個無效 |
 
 JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 記錄其來源、檔案數量與 SHA-256 樹狀摘要。
@@ -43,7 +43,7 @@ JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 - `CanonicalJson` 提供 RFC 8785 JCS 與 SHA-256 識別碼。
 - `Ed25519`、`Base64Url` 與 `DocumentSignatures` 提供 JDK Ed25519 簽署、無填補 base64url，以及頂層 `signature` 省略。
 - `SignedDocumentCodec` 執行完整的六階段簽章文件流程；請明確傳入 `SignedDocumentKind`，並提供 `SigningKey`，或連接組織控制之 Agent Registry 的 `KeyResolver` 轉接器。
-- `ConformanceRunner` 與 `ConformanceCli` 執行全部 52 個內建向量。
+- `ConformanceRunner` 與 `ConformanceCli` 執行全部 56 個內建向量。
 
 ## 快速開始
 
@@ -109,7 +109,7 @@ public final class QuickStart {
   exec:java
 ```
 
-內建結果為 `52/52 conformance vectors passed`。
+內建結果為 `56/56 conformance vectors passed`。
 
 ## 文件
 
@@ -121,7 +121,7 @@ public final class QuickStart {
 - Schema 驗證檢查文件結構與格式；它不會授予權限、驗證 Agent 身分，或證明某個動作獲准。
 - 簽章輔助工具不提供金鑰信任、儲存、探索、撤銷、時間戳記政策、重播防護，也不提供透過 Session Epoch 與 Membership Epoch 使舊 Session 權限或舊 Membership 權限失效的 fencing。
 - `FrameCodec` 是序列化器，不是傳輸層、Coordinator、Worker Scheduler、持久化儲存、重試引擎或狀態機實作。
-- `52/52` 結果僅證明 Schema 與測試向量符合性；它不代表互通性、完整行為、安全性或生產就緒性。
+- `56/56` 結果僅證明 Schema 與測試向量符合性；它不代表互通性、完整行為、安全性或生產就緒性。
 
 ## 開發
 
