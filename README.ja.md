@@ -41,7 +41,22 @@ JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN
 - `FrameCodec` は汎用 MissionWeaveProtocol WebSocket フレームを厳密にデコード、検証、正規エンコードします。接続自体は作成しません。
 - `CanonicalJson` は RFC 8785 JCS と SHA-256 識別子を提供します。
 - `Ed25519`、`Base64Url`、`DocumentSignatures` は JDK Ed25519 署名、パディングなし base64url、トップレベル `signature` の除外を提供します。
-- `SignedDocumentCodec` は 6 段階の署名文書プロファイル全体を実行します。`SignedDocumentKind` と、`SigningKey` または組織管理の Agent Registry に接続する `KeyResolver` アダプターを明示的に渡します。
+- `SignedDocumentCodec` は 6 段階の署名文書プロファイル全体を実行します。
+  `KeyResolver` は `KeyResolutionRequest` を受け取り、
+  `KeyRegistrySnapshot.organizationWide(registryBytes)` で生成され、完全な Registry
+  バイト列を含む `KeyRegistrySnapshot` を返します。選択済みの `ResolvedKey` は返しません。
+- `ORGANIZATION_WIDE` は信頼されたアダプターの表明であり、完全性の証明ではありません。
+  この表明は、Organization が管理する 1 つの Agent Registry について、検証判断に適用可能な
+  単一で一貫した権威ある Registry リビジョン、Organization 全体のすべての鍵バインディング、
+  および保持されている完全な有効性履歴をバイト列が網羅することを示します。
+  `request.keyId()` はルーティングコンテキストにすぎず、Registry の
+  フィルタリングや、要求された鍵だけを返す部分投影に使用してはいけません。
+- コーデックはバイト列を信頼せず、すべての鍵バインディング、グローバルな再利用禁止と
+  エイリアス禁止の不変条件、完全な有効性履歴を検証してから鍵を選択します。
+  `KeyRegistrySnapshot` が `null`、完全性が `PARTIAL` または `UNSPECIFIED`、あるいは
+  Registry エビデンスが空、取得できない、または形式不正の場合は、鍵解決段階で安全側に
+  拒否されます（fail closed）。コーデックが生成する `ResolvedKey` には Registry の
+  `organizationId` も保持されます。
 - `ConformanceRunner` と `ConformanceCli` は同梱された 56 ベクトルをすべて実行します。
 
 ## クイックスタート
@@ -73,7 +88,9 @@ public final class QuickStart {
 ```
 
 永続的な署名対象では `SignedDocumentCodec.sign(kind, unsigned, signingKey)` と
-`verify(kind, receivedBytes, keyResolver)` を使用します。文書種別は推論されず、不変の検証証拠が返されます。
+`verify(kind, receivedBytes, keyResolver)` を使用します。文書種別は推論されず、不変の検証
+エビデンスとして、受信バイト列、署名対象バイト列とそのハッシュ、および完全な正規化
+バイト列とそのハッシュが返されます。
 
 ## 実行可能なサンプル
 

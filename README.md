@@ -47,9 +47,19 @@ records its source, file counts, and SHA-256 tree digests.
 - `CanonicalJson` provides RFC 8785 JCS and SHA-256 identifiers.
 - `Ed25519`, `Base64Url`, and `DocumentSignatures` provide JDK Ed25519 signing,
   unpadded base64url, and top-level `signature` omission.
-- `SignedDocumentCodec` applies the complete six-stage Signed Document profile; pass an explicit
-  `SignedDocumentKind` plus your `SigningKey` or a `KeyResolver` adapter for an
-  Organization-controlled Agent Registry.
+- `SignedDocumentCodec` applies the complete six-stage Signed Document profile. A `KeyResolver`
+  receives a `KeyResolutionRequest` and returns a `KeyRegistrySnapshot` created with
+  `KeyRegistrySnapshot.organizationWide(registryBytes)` and containing complete Registry bytes,
+  not a selected `ResolvedKey`.
+- `ORGANIZATION_WIDE` is a trusted adapter assertion, not a completeness proof. It states that
+  those bytes cover one coherent, authoritative Registry revision applicable to the verification
+  decision for one Organization-controlled Agent Registry, including all Organization-wide
+  bindings and its complete retained validity history. `request.keyId()` is routing context only
+  and must never filter the Registry or return a partial projection.
+- The codec treats the bytes as untrusted and validates every binding, global no-reuse and
+  no-alias invariants, and complete validity history before selecting the key. `PARTIAL`,
+  `UNSPECIFIED`, `null`, empty, unavailable, or malformed evidence fails closed at key resolution;
+  codec-produced evidence retains `organizationId`.
 - `ConformanceRunner` and `ConformanceCli` run all 56 packaged vectors.
 
 ## Quick start
@@ -82,7 +92,8 @@ public final class QuickStart {
 
 For durable signed objects, call `SignedDocumentCodec.sign(kind, unsigned, signingKey)` and
 `verify(kind, receivedBytes, keyResolver)`. The codec never infers the kind and returns immutable
-verification evidence including received, signing, and complete canonical bytes and hashes.
+verification evidence including the received bytes, the signing bytes and their hash, and the
+complete canonical bytes and their hash.
 
 ## Runnable examples
 

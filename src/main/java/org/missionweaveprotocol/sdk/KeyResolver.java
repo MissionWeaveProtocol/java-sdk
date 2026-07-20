@@ -4,8 +4,13 @@ package org.missionweaveprotocol.sdk;
 @FunctionalInterface
 public interface KeyResolver {
   /**
-   * Resolve an immutable binding after enforcing Organization-wide key-ID, public-key, tuple, and
-   * append-only validity-history invariants. Return {@code null} when the key is unknown.
+   * Return one coherent, authoritative, applicable Organization-wide Registry snapshot.
+   *
+   * <p>The snapshot must contain the Organization-wide bindings and complete retained history
+   * needed for verification. An authoritative unknown key is represented by a non-null complete
+   * snapshot in which the key is absent. Every request field, including {@link
+   * KeyResolutionRequest#keyId()}, is routing and observability context only; an adapter must never
+   * filter the returned evidence to the requested key.
    */
-  ResolvedKey resolve(KeyResolutionRequest request);
+  KeyRegistrySnapshot resolve(KeyResolutionRequest request) throws KeyResolutionException;
 }

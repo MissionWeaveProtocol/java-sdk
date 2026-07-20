@@ -42,7 +42,21 @@ registra su origen, el número de archivos y los resúmenes SHA-256 del árbol.
 - `FrameCodec` decodifica, valida y codifica canónicamente tramas WebSocket genéricas de MissionWeaveProtocol; no crea una conexión.
 - `CanonicalJson` proporciona JCS RFC 8785 e identificadores SHA-256.
 - `Ed25519`, `Base64Url` y `DocumentSignatures` proporcionan firmas Ed25519 del JDK, base64url sin relleno y omisión del `signature` de nivel superior.
-- `SignedDocumentCodec` ejecuta el perfil completo de documento firmado en seis etapas; recibe un `SignedDocumentKind` explícito, un `SigningKey` o un adaptador `KeyResolver` para un Agent Registry controlado por la organización.
+- `SignedDocumentCodec` ejecuta el perfil completo de documento firmado en seis etapas. Un
+  `KeyResolver` recibe un `KeyResolutionRequest` y devuelve un `KeyRegistrySnapshot` creado
+  mediante `KeyRegistrySnapshot.organizationWide(registryBytes)` y que contiene los bytes
+  completos del Registry, nunca un `ResolvedKey` ya seleccionado.
+- `ORGANIZATION_WIDE` es la afirmación de un adaptador de confianza, no una prueba de completitud.
+  Indica que esos bytes abarcan una revisión coherente y autoritativa, aplicable a la decisión de
+  verificación, de un único Agent Registry controlado por la organización, incluidas todas las
+  vinculaciones de la organización y todo el historial de validez conservado.
+  `request.keyId()` sirve únicamente como contexto de encaminamiento y nunca debe utilizarse para
+  filtrar el Registry ni devolver una proyección parcial.
+- El códec trata los bytes como datos no confiables y valida cada vinculación, los invariantes
+  globales contra la reutilización y los alias, y el historial de validez completo antes de
+  seleccionar la clave. Si el `KeyRegistrySnapshot` es `null`, su completitud es `PARTIAL` o
+  `UNSPECIFIED`, o la evidencia del Registry está vacía, no disponible o malformada, la resolución
+  de claves falla de forma cerrada; la evidencia producida por el códec conserva `organizationId`.
 - `ConformanceRunner` y `ConformanceCli` ejecutan los 56 vectores incluidos.
 
 ## Inicio rápido
@@ -74,7 +88,9 @@ public final class QuickStart {
 ```
 
 Para objetos firmados duraderos, usa `SignedDocumentCodec.sign(kind, unsigned, signingKey)` y
-`verify(kind, receivedBytes, keyResolver)`; el códec no infiere el tipo y devuelve evidencia de verificación inmutable.
+`verify(kind, receivedBytes, keyResolver)`; el códec no infiere el tipo y devuelve evidencia de
+verificación inmutable que incluye los bytes recibidos, los bytes usados para la firma y su hash, y
+los bytes canónicos del documento completo y su hash.
 
 ## Ejemplos ejecutables
 

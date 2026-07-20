@@ -37,6 +37,32 @@ evaluations: 12 complete and 46 rejected at their first normative semantic stage
 - the source tree, compiled classpath, built JAR, and installed Maven consumer
   are exercised independently.
 
+For Signed Document stage 4, the SDK tests the complete Registry-evidence path:
+
+- the completeness gate rejects null snapshots, `PARTIAL`, `UNSPECIFIED`, unavailable evidence,
+  and empty Registry bytes;
+- strict Registry JSON parsing rejects invalid UTF-8, byte-order marks, duplicate members, and
+  trailing data, then checks the exact root and binding shapes and absolute identifiers;
+- every binding is validated, including unrelated bindings, with canonical 32-byte Ed25519 keys
+  and strict non-identity, on-curve, prime-order point checks;
+- global indexes enforce immutable key-ID bindings, unique public-key ownership, and no aliases
+  for a Principal/algorithm/public-key tuple;
+- complete retained history is checked for contiguous sequence numbers, semantically equivalent
+  duplicate sequence records (equal RFC 3339 instants may use different text, with the first text
+  preserved), append order, immutable `validFrom`, and monotonic `validUntil` and `revokedAt`
+  restrictions;
+- fixtures with more than 64 bindings and more than 64 history records confirm that fixture-only
+  limits are not imposed by the runtime;
+- key selection happens only after the complete scan, and codec-produced evidence retains the
+  Registry `organizationId`.
+
+Those checks validate the evidence supplied to the codec. The deployment adapter remains
+responsible for establishing trust, Organization scope, the applicability or currency of the
+authoritative coherent revision, completeness, and historical coverage before asserting
+`ORGANIZATION_WIDE`. The bytes carried by `KeyRegistrySnapshot` are a Java-SDK-local evidence
+representation, not a standardized Registry snapshot wire artifact. This coverage therefore does
+not claim complete runtime protocol conformance.
+
 Run the packaged vectors:
 
 ```bash
@@ -74,8 +100,8 @@ scripts/smoke_install.sh
 `verify` runs unit tests, creates the binary and source JARs, checks formatting,
 and executes integration tests against the built binary JAR. The installed
 consumer smoke test then installs `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT`
-and compiles a fresh Maven project that verifies packaged resources, runs all 56
-vectors, and decodes a schema-valid frame.
+and compiles a fresh Maven project that exercises the Registry snapshot public API, verifies
+packaged resources, runs all 56 vectors, and decodes a schema-valid frame.
 
 ## Deliberate limits
 

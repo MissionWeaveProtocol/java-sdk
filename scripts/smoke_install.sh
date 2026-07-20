@@ -75,9 +75,9 @@ import java.io.InputStream;
 import org.missionweaveprotocol.sdk.ConformanceReport;
 import org.missionweaveprotocol.sdk.ConformanceRunner;
 import org.missionweaveprotocol.sdk.FrameCodec;
-import org.missionweaveprotocol.sdk.Principal;
+import org.missionweaveprotocol.sdk.KeyRegistryCompleteness;
+import org.missionweaveprotocol.sdk.KeyRegistrySnapshot;
 import org.missionweaveprotocol.sdk.ProtocolBundle;
-import org.missionweaveprotocol.sdk.ResolvedKey;
 import org.missionweaveprotocol.sdk.SignedDocumentCodec;
 import org.missionweaveprotocol.sdk.SignedDocumentKind;
 
@@ -106,38 +106,45 @@ public final class Consumer {
         """.getBytes(StandardCharsets.UTF_8);
     new FrameCodec().decode(ping);
 
-    byte[] command;
-    try (InputStream input =
-        Consumer.class
-            .getClassLoader()
-            .getResourceAsStream("cryptography/vectors/signed-documents/valid/command.json")) {
-      if (input == null) {
-        throw new IllegalStateException("Installed JAR is missing the golden Command");
-      }
-      command = input.readAllBytes();
+    byte[] command =
+        resource(
+            "cryptography/vectors/signed-documents/valid/command.json",
+            "Installed JAR is missing the golden Command");
+    byte[] registryBytes =
+        resource(
+            "cryptography/keys/registry-valid.json",
+            "Installed JAR is missing the complete Registry fixture");
+    KeyRegistrySnapshot snapshot = KeyRegistrySnapshot.organizationWide(registryBytes);
+    if (snapshot.completeness() != KeyRegistryCompleteness.ORGANIZATION_WIDE) {
+      throw new IllegalStateException("Installed SDK lost the Registry completeness assertion");
     }
     var verified =
         new SignedDocumentCodec()
             .verify(
                 SignedDocumentKind.COMMAND,
                 command,
-                request ->
-                    new ResolvedKey(
-                        request.keyId(),
-                        new Principal(
-                            "agent",
-                            "urn:missionweaveprotocol:agent:crypto-vector-coordinator"),
-                        "Ed25519",
-                        "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
-                        "2026-07-15T08:00:00+08:00",
-                        "2026-07-16T00:00:00Z",
-                        null));
+                request -> snapshot);
     if (!verified.signingHash().equals(
         "sha256:6655c5d67ae3ecc19a4ed04bda7f1372aeaafc7adf939a77715de96ef2100695")) {
       throw new IllegalStateException("Installed JAR failed golden Command verification");
     }
+    if (!verified
+        .resolvedKey()
+        .organizationId()
+        .equals("urn:missionweaveprotocol:organization:acme")) {
+      throw new IllegalStateException("Installed SDK lost the resolved Organization evidence");
+    }
     System.out.println(
         "Installed SDK smoke passed: " + report.summary() + "; " + verified.signingHash());
+  }
+
+  private static byte[] resource(String path, String missingMessage) throws Exception {
+    try (InputStream input = Consumer.class.getClassLoader().getResourceAsStream(path)) {
+      if (input == null) {
+        throw new IllegalStateException(missingMessage);
+      }
+      return input.readAllBytes();
+    }
   }
 }
 EOF

@@ -42,7 +42,21 @@ dokumentiert Quelle, Dateianzahlen und SHA-256-Baum-Digests.
 - `FrameCodec` dekodiert, validiert und kanonisch kodiert generische MissionWeaveProtocol-WebSocket-Frames; er stellt keine Verbindung her.
 - `CanonicalJson` bietet RFC 8785 JCS und SHA-256-Bezeichner.
 - `Ed25519`, `Base64Url` und `DocumentSignatures` bieten JDK-Ed25519-Signaturen, ungepolstertes base64url und das Auslassen des obersten `signature`-Feldes.
-- `SignedDocumentCodec` führt das vollständige sechsstufige Profil für signierte Dokumente aus; übergib explizit einen `SignedDocumentKind` sowie einen `SigningKey` oder einen `KeyResolver`-Adapter für eine organisationskontrollierte Agent Registry.
+- `SignedDocumentCodec` führt das vollständige sechsstufige Profil für signierte Dokumente aus.
+  Ein `KeyResolver` erhält einen `KeyResolutionRequest` und gibt einen mit
+  `KeyRegistrySnapshot.organizationWide(registryBytes)` erzeugten `KeyRegistrySnapshot` zurück,
+  der die vollständigen Registry-Bytes enthält, niemals einen bereits ausgewählten `ResolvedKey`.
+- `ORGANIZATION_WIDE` ist die Zusicherung eines vertrauenswürdigen Adapters, kein
+  Vollständigkeitsnachweis. Sie besagt, dass diese Bytes eine kohärente, maßgebliche und für die
+  Prüfentscheidung anwendbare Revision genau einer organisationskontrollierten Agent Registry mit
+  allen organisationsweiten Bindungen und der vollständig aufbewahrten Gültigkeitshistorie
+  abdecken. `request.keyId()` dient ausschließlich als Routing-Kontext und darf niemals dazu
+  verwendet werden, die Registry zu filtern oder eine Teilprojektion davon zurückzugeben.
+- Der Codec behandelt die Bytes als nicht vertrauenswürdig und validiert vor der Schlüsselauswahl
+  jede Bindung, die globalen Invarianten gegen Wiederverwendung und Aliase sowie die vollständige
+  Gültigkeitshistorie. Ist der Nachweis `PARTIAL`, `UNSPECIFIED`, `null`, leer, nicht verfügbar oder
+  fehlerhaft, bricht die Schlüsselauflösung nach dem Fail-Closed-Prinzip ab; vom Codec erzeugte
+  Nachweise behalten `organizationId` bei.
 - `ConformanceRunner` und `ConformanceCli` führen alle 56 enthaltenen Vektoren aus.
 
 ## Schnellstart
@@ -74,7 +88,9 @@ public final class QuickStart {
 ```
 
 Für dauerhafte signierte Objekte verwende `SignedDocumentCodec.sign(kind, unsigned, signingKey)` und
-`verify(kind, receivedBytes, keyResolver)`; der Codec leitet den Typ nie ab und liefert unveränderliche Prüfnachweise.
+`verify(kind, receivedBytes, keyResolver)`; der Codec leitet den Typ nie ab und liefert
+unveränderliche Prüfnachweise, die die empfangenen Bytes, die zum Signieren verwendeten Bytes und
+deren Hash sowie die kanonischen Bytes des vollständigen Dokuments und deren Hash enthalten.
 
 ## Ausführbare Beispiele
 

@@ -2,8 +2,9 @@ package org.missionweaveprotocol.sdk;
 
 import java.util.Objects;
 
-/** Key binding returned by an Organization-controlled Agent Registry adapter. */
+/** Codec-produced evidence for a binding selected from a validated Registry snapshot. */
 public record ResolvedKey(
+    String organizationId,
     String keyId,
     Principal principal,
     String algorithm,
@@ -12,6 +13,7 @@ public record ResolvedKey(
     String validUntil,
     String revokedAt) {
   public ResolvedKey {
+    Objects.requireNonNull(organizationId, "organizationId");
     Objects.requireNonNull(keyId, "keyId");
     Objects.requireNonNull(principal, "principal");
     Objects.requireNonNull(algorithm, "algorithm");
