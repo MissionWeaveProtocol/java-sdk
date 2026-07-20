@@ -30,6 +30,7 @@ final class AgentRegistryKeyResolution {
     JsonNode registry = StrictJson.parse(registryBytes);
     requireExactObject(registry, ROOT_FIELDS, ROOT_FIELDS, "Registry");
     String organizationId = text(registry, "organizationId");
+    requireProtocolUri(organizationId, "Registry organizationId");
     JsonNode rawBindings = registry.path("bindings");
     if (!rawBindings.isArray() || rawBindings.size() == 0) {
       throw new IllegalArgumentException("Registry bindings must be a non-empty array");
@@ -38,8 +39,8 @@ final class AgentRegistryKeyResolution {
     Map<String, Binding> bindings = new HashMap<>();
     Map<String, KeyOwner> publicKeyOwners = new HashMap<>();
     Map<KeyTuple, String> tupleIds = new HashMap<>();
-    for (JsonNode rawBinding : rawBindings) {
-      Binding candidate = parseBinding(rawBinding);
+    for (int index = 0; index < rawBindings.size(); index++) {
+      Binding candidate = parseBinding(rawBindings.get(index), index);
       Binding binding = bindings.get(candidate.keyId);
       if (binding == null) {
         bindings.put(candidate.keyId, candidate);
@@ -83,10 +84,11 @@ final class AgentRegistryKeyResolution {
     return selected.resolved(organizationId);
   }
 
-  private static Binding parseBinding(JsonNode rawBinding) {
+  private static Binding parseBinding(JsonNode rawBinding, int index) {
     requireExactObject(rawBinding, BINDING_FIELDS, BINDING_FIELDS, "Registry binding");
     String keyId = text(rawBinding, "keyId");
-    Principal principal = parsePrincipal(rawBinding.path("principal"));
+    requireProtocolUri(keyId, "Registry binding[" + index + "].keyId");
+    Principal principal = parsePrincipal(rawBinding.path("principal"), index);
     String algorithm = text(rawBinding, "algorithm");
     if (!algorithm.equals("Ed25519")) {
       throw new IllegalArgumentException("Registry key algorithm is not Ed25519");
@@ -116,10 +118,13 @@ final class AgentRegistryKeyResolution {
     return new Binding(keyId, principal, algorithm, publicKey, validFromText, validFrom, history);
   }
 
-  private static Principal parsePrincipal(JsonNode rawPrincipal) {
+  private static Principal parsePrincipal(JsonNode rawPrincipal, int bindingIndex) {
     requireExactObject(
         rawPrincipal, PRINCIPAL_FIELDS, PRINCIPAL_FIELDS, "Registry binding Principal");
-    return new Principal(text(rawPrincipal, "type"), text(rawPrincipal, "id"));
+    String type = text(rawPrincipal, "type");
+    String id = text(rawPrincipal, "id");
+    requireProtocolUri(id, "Registry binding[" + bindingIndex + "].principal.id");
+    return new Principal(type, id);
   }
 
   private static Status parseStatus(JsonNode rawStatus) {
@@ -163,6 +168,12 @@ final class AgentRegistryKeyResolution {
 
   private static String optionalText(JsonNode object, String field) {
     return object.has(field) ? text(object, field) : null;
+  }
+
+  private static void requireProtocolUri(String value, String label) {
+    if (!SchemaCatalog.isProtocolUri(value)) {
+      throw new IllegalArgumentException(label + " is not an absolute visible-ASCII URI");
+    }
   }
 
   private static ExactInstant parseOptionalInstant(String text) {

@@ -22,12 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /** One fully resolved, offline Draft 2020-12 catalog of normative protocol schemas. */
 public final class SchemaCatalog {
   private static final String SCHEMA_PREFIX = "schemas/";
   private static final String DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema";
+  private static final Pattern URI_SCHEME = Pattern.compile("[A-Za-z][A-Za-z0-9+.-]*:");
   private static final Format DATE_TIME_FORMAT =
       new Format() {
         @Override
@@ -65,13 +67,7 @@ public final class SchemaCatalog {
 
         @Override
         public boolean matches(ExecutionContext executionContext, String value) {
-          if (!isVisibleAscii(value)) {
-            return false;
-          }
-          if (value.matches("[A-Za-z][A-Za-z0-9+.-]*:")) {
-            return true;
-          }
-          return STANDARD_URI_FORMAT.matches(executionContext, value);
+          return isProtocolUri(value);
         }
       };
 
@@ -224,6 +220,20 @@ public final class SchemaCatalog {
       throw new IllegalArgumentException("Invalid schema name: " + schemaName);
     }
     return name;
+  }
+
+  static boolean isProtocolUri(String value) {
+    if (!isVisibleAscii(value)) {
+      return false;
+    }
+    var scheme = URI_SCHEME.matcher(value);
+    if (!scheme.lookingAt()) {
+      return false;
+    }
+    if (scheme.end() == value.length()) {
+      return true;
+    }
+    return STANDARD_URI_FORMAT.matches(null, value);
   }
 
   private static boolean isVisibleAscii(String value) {
