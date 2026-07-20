@@ -2,7 +2,7 @@ package org.missionweaveprotocol.sdk;
 
 import java.util.Objects;
 
-/** Lossless information needed to resolve one Signed Document key binding. */
+/** Lossless routing and selection context for acquiring complete Registry evidence. */
 public record KeyResolutionRequest(
     SignedDocumentKind kind,
     String keyId,
@@ -10,6 +10,13 @@ public record KeyResolutionRequest(
     boolean servicePrincipalRequired,
     String protectedTime,
     ExactInstant protectedInstant) {
+  /**
+   * Construct complete context for one verification decision.
+   *
+   * <p>These fields help an adapter locate the applicable authoritative Registry revision and help
+   * the codec select a binding after validating the complete snapshot. They do not authorize a
+   * key-filtered projection or omission of Organization-wide bindings or retained history.
+   */
   public KeyResolutionRequest {
     Objects.requireNonNull(kind, "kind");
     Objects.requireNonNull(keyId, "keyId");

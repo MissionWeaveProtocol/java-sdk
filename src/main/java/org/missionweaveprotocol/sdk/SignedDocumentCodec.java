@@ -173,43 +173,15 @@ public final class SignedDocumentCodec {
               kind.servicePrincipalRequired(),
               envelope.protectedTime,
               envelope.protectedInstant);
-      ResolvedKey resolved = resolver.resolve(request);
-      if (resolved == null) {
-        throw new IllegalArgumentException("signature.keyId is unknown");
+      KeyRegistrySnapshot snapshot = resolver.resolve(request);
+      if (snapshot == null) {
+        throw new IllegalArgumentException("Registry resolver returned no evidence");
       }
-      if (!resolved.keyId().equals(request.keyId())) {
-        throw new IllegalArgumentException("resolver returned a different key ID");
+      if (snapshot.completeness() != KeyRegistryCompleteness.ORGANIZATION_WIDE) {
+        throw new IllegalArgumentException("Registry evidence is not Organization-wide complete");
       }
-      if (!resolved.algorithm().equals("Ed25519")) {
-        throw new IllegalArgumentException("resolved key algorithm is not Ed25519");
-      }
-      byte[] publicKey = canonicalBase64Url(resolved.publicKey(), "resolved public key");
-      if (publicKey.length != 32) {
-        throw new IllegalArgumentException("resolved public key does not decode to 32 bytes");
-      }
-      Ed25519Point.validate(publicKey, false, "resolved public key");
-      if (kind.servicePrincipalRequired()) {
-        if (!resolved.principal().type().equals("service")) {
-          throw new IllegalArgumentException("Agent Card signer is not a service Principal");
-        }
-      } else if (!resolved.principal().equals(envelope.expectedPrincipal)) {
-        throw new IllegalArgumentException("resolved key is bound to the wrong Principal");
-      }
-
-      ExactInstant validFrom = ExactInstant.parse(resolved.validFrom());
-      ExactInstant validUntil = nullableInstant(resolved.validUntil());
-      ExactInstant revokedAt = nullableInstant(resolved.revokedAt());
-      if (envelope.protectedInstant.compareTo(validFrom) < 0) {
-        throw new IllegalArgumentException("signing key is not yet valid at the protected time");
-      }
-      if (validUntil != null && envelope.protectedInstant.compareTo(validUntil) >= 0) {
-        throw new IllegalArgumentException("signing key is expired at the protected time");
-      }
-      if (revokedAt != null && envelope.protectedInstant.compareTo(revokedAt) >= 0) {
-        throw new IllegalArgumentException("signing key is revoked at the protected time");
-      }
-      return resolved;
-    } catch (RuntimeException error) {
+      return AgentRegistryKeyResolution.resolve(snapshot.registryBytes(), request);
+    } catch (KeyResolutionException | IOException | RuntimeException error) {
       throw failure(VerificationStage.KEY_RESOLUTION, message(error));
     }
   }
@@ -257,10 +229,6 @@ public final class SignedDocumentCodec {
       throw new IllegalArgumentException("expected signer is not a Principal object");
     }
     return new Principal(selected.path("type").textValue(), selected.path("id").textValue());
-  }
-
-  private static ExactInstant nullableInstant(String value) {
-    return value == null ? null : ExactInstant.parse(value);
   }
 
   private static byte[] canonicalBase64Url(String value, String label) {

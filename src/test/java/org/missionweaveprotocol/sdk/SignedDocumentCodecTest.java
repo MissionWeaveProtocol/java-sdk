@@ -14,11 +14,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -28,25 +26,23 @@ class SignedDocumentCodecTest {
   @Test
   void verifiesTheGoldenCommandThroughThePublicInterface() throws Exception {
     byte[] received = resource("cryptography/vectors/signed-documents/valid/command.json");
+    byte[] registry = resource("cryptography/keys/registry-valid.json");
     byte[] expectedSigningBytes =
         resource("cryptography/vectors/canonicalization/command.signing.jcs");
-    ResolvedKey resolvedKey =
-        new ResolvedKey(
-            "urn:missionweaveprotocol:key:crypto-vector-rfc8032-1",
-            new Principal("agent", "urn:missionweaveprotocol:agent:crypto-vector-coordinator"),
-            "Ed25519",
-            "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
-            "2026-07-15T08:00:00+08:00",
-            "2026-07-16T00:00:00Z",
-            null);
+    String expectedKeyId = "urn:missionweaveprotocol:key:crypto-vector-rfc8032-1";
+    Principal expectedPrincipal =
+        new Principal("agent", "urn:missionweaveprotocol:agent:crypto-vector-coordinator");
+    AtomicInteger resolutionCalls = new AtomicInteger();
     KeyResolver resolver =
         request -> {
+          resolutionCalls.incrementAndGet();
           assertEquals(SignedDocumentKind.COMMAND, request.kind());
-          assertEquals(resolvedKey.keyId(), request.keyId());
-          assertEquals(resolvedKey.principal(), request.expectedPrincipal());
+          assertEquals(expectedKeyId, request.keyId());
+          assertEquals(expectedPrincipal, request.expectedPrincipal());
           assertFalse(request.servicePrincipalRequired());
           assertEquals("2026-07-15T00:00:00Z", request.protectedTime());
-          return resolvedKey;
+          assertEquals(ExactInstant.parse("2026-07-15T00:00:00Z"), request.protectedInstant());
+          return KeyRegistrySnapshot.organizationWide(registry);
         };
 
     VerifiedSignedDocument verified =
@@ -65,10 +61,13 @@ class SignedDocumentCodecTest {
         CanonicalJson.canonicalize(StrictJson.parse(received)), verified.canonicalBytes());
     assertEquals("2026-07-15T00:00:00Z", verified.protectedTime());
     assertEquals("", verified.protectedInstant().fractionalDigits());
-    assertEquals(resolvedKey, verified.resolvedKey());
-    assertEquals(resolvedKey.principal(), verified.resolvedPrincipal());
+    assertEquals(1, resolutionCalls.get());
+    assertEquals(
+        "urn:missionweaveprotocol:organization:acme", verified.resolvedKey().organizationId());
+    assertEquals(expectedKeyId, verified.resolvedKey().keyId());
+    assertEquals(expectedPrincipal, verified.resolvedPrincipal());
     assertEquals("Ed25519", verified.signature().algorithm());
-    assertEquals(resolvedKey.keyId(), verified.signature().keyId());
+    assertEquals(expectedKeyId, verified.signature().keyId());
     assertEquals("2026-07-15T00:00:00Z", verified.signature().createdAt());
     assertEquals(64, verified.signature().bytes().length);
 
@@ -112,20 +111,12 @@ class SignedDocumentCodecTest {
   @Test
   void snapshotsReceivedBytesBeforeCallingTheExternalResolver() throws Exception {
     byte[] original = resource("cryptography/vectors/signed-documents/valid/command.json");
+    byte[] registry = resource("cryptography/keys/registry-valid.json");
     byte[] callerBytes = original.clone();
-    ResolvedKey resolvedKey =
-        new ResolvedKey(
-            "urn:missionweaveprotocol:key:crypto-vector-rfc8032-1",
-            new Principal("agent", "urn:missionweaveprotocol:agent:crypto-vector-coordinator"),
-            "Ed25519",
-            "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
-            "2026-07-15T08:00:00+08:00",
-            "2026-07-16T00:00:00Z",
-            null);
     KeyResolver resolver =
         request -> {
           Arrays.fill(callerBytes, (byte) 0);
-          return resolvedKey;
+          return KeyRegistrySnapshot.organizationWide(registry);
         };
 
     VerifiedSignedDocument verified =
@@ -170,7 +161,7 @@ class SignedDocumentCodecTest {
         byte[] document = resource(evaluation.path("document").textValue());
         byte[] registryFixture = resource(evaluation.path("registry").textValue());
         fixtureSchemas.catalog().validate(fixtureSchemas.registrySchema(), registryFixture);
-        KeyResolver resolver = new FixtureKeyResolver(registryFixture);
+        KeyResolver resolver = request -> KeyRegistrySnapshot.organizationWide(registryFixture);
         JsonNode signingKeyFixture = null;
         if (evaluation.has("signingKey")) {
           byte[] signingKeyBytes = resource(evaluation.path("signingKey").textValue());
@@ -224,6 +215,7 @@ class SignedDocumentCodecTest {
 
   @Test
   void rejectsNonAsciiKeyIdentifiersDuringSchemaValidation() throws Exception {
+    byte[] registry = resource("cryptography/keys/registry-valid.json");
     String received =
         new String(
                 resource("cryptography/vectors/signed-documents/valid/command.json"),
@@ -235,14 +227,7 @@ class SignedDocumentCodecTest {
     KeyResolver resolver =
         request -> {
           resolved.set(true);
-          return new ResolvedKey(
-              request.keyId(),
-              request.expectedPrincipal(),
-              "Ed25519",
-              "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
-              "2026-07-15T08:00:00+08:00",
-              "2026-07-16T00:00:00Z",
-              null);
+          return KeyRegistrySnapshot.organizationWide(registry);
         };
 
     SignedDocumentVerificationException error =
@@ -377,226 +362,4 @@ class SignedDocumentCodecTest {
 
   private record FixtureSchemas(
       SchemaCatalog catalog, String registrySchema, String signingKeySchema) {}
-
-  private static final class FixtureKeyResolver implements KeyResolver {
-    private static final long MAX_SAFE_INTEGER = 9_007_199_254_740_991L;
-
-    private final byte[] registryBytes;
-
-    private FixtureKeyResolver(byte[] registryBytes) {
-      this.registryBytes = registryBytes.clone();
-    }
-
-    @Override
-    public ResolvedKey resolve(KeyResolutionRequest request) {
-      try {
-        return resolveChecked(request);
-      } catch (IOException error) {
-        throw new IllegalArgumentException("Registry fixture is not strict JSON", error);
-      }
-    }
-
-    private ResolvedKey resolveChecked(KeyResolutionRequest request) throws IOException {
-      JsonNode registry = StrictJson.parse(registryBytes);
-      if (!registry.isObject() || !registry.path("bindings").isArray()) {
-        throw new IllegalArgumentException("Registry fixture has invalid structure");
-      }
-
-      Map<String, Binding> bindings = new HashMap<>();
-      Map<String, String> publicKeyOwners = new HashMap<>();
-      Map<String, String> tupleIds = new HashMap<>();
-      for (JsonNode rawBinding : registry.path("bindings")) {
-        String keyId = text(rawBinding, "keyId");
-        Principal principal =
-            new Principal(
-                text(rawBinding.path("principal"), "type"),
-                text(rawBinding.path("principal"), "id"));
-        String algorithm = text(rawBinding, "algorithm");
-        if (!algorithm.equals("Ed25519")) {
-          throw new IllegalArgumentException("Registry key algorithm is not Ed25519");
-        }
-        String publicKey = text(rawBinding, "publicKey");
-        byte[] publicKeyBytes = canonicalBase64(publicKey);
-        if (publicKeyBytes.length != 32) {
-          throw new IllegalArgumentException("Registry public key is not 32 bytes");
-        }
-        String validFromText = text(rawBinding, "validFrom");
-        ExactInstant validFrom = ExactInstant.parse(validFromText);
-        Binding candidate =
-            new Binding(
-                keyId, principal, algorithm, publicKey, validFromText, validFrom, new TreeMap<>());
-        Binding binding = bindings.get(keyId);
-        if (binding == null) {
-          bindings.put(keyId, candidate);
-          binding = candidate;
-        } else if (!binding.sameImmutable(candidate)) {
-          throw new IllegalArgumentException("Registry reuses a key ID for another binding");
-        }
-
-        String owner = keyId + '\u0000' + principal.type() + '\u0000' + principal.id();
-        String previousOwner = publicKeyOwners.putIfAbsent(publicKey, owner);
-        if (previousOwner != null && !previousOwner.equals(owner)) {
-          throw new IllegalArgumentException("Registry reuses a public key");
-        }
-        String tuple =
-            principal.type()
-                + '\u0000'
-                + principal.id()
-                + '\u0000'
-                + algorithm
-                + '\u0000'
-                + publicKey;
-        String previousId = tupleIds.putIfAbsent(tuple, keyId);
-        if (previousId != null && !previousId.equals(keyId)) {
-          throw new IllegalArgumentException("Registry contains a key-ID alias");
-        }
-
-        JsonNode history = rawBinding.path("validityHistory");
-        if (!history.isArray()) {
-          throw new IllegalArgumentException("Registry validityHistory is not an array");
-        }
-        for (JsonNode rawStatus : history) {
-          long sequence = positiveSafeInteger(rawStatus.path("sequence"));
-          Status status =
-              new Status(
-                  sequence,
-                  ExactInstant.parse(text(rawStatus, "recordedAt")),
-                  optionalText(rawStatus, "validUntil"),
-                  optionalInstant(rawStatus, "validUntil"),
-                  optionalText(rawStatus, "revokedAt"),
-                  optionalInstant(rawStatus, "revokedAt"));
-          Status previous = binding.history.putIfAbsent(sequence, status);
-          if (previous != null && !previous.equals(status)) {
-            throw new IllegalArgumentException("Registry rewrites validity history");
-          }
-        }
-      }
-
-      for (Binding binding : bindings.values()) {
-        long expectedSequence = 1;
-        ExactInstant previousRecorded = null;
-        for (Status status : binding.history.values()) {
-          if (status.sequence != expectedSequence++) {
-            throw new IllegalArgumentException("Registry validity history is not contiguous");
-          }
-          if (previousRecorded != null && status.recordedAt.compareTo(previousRecorded) < 0) {
-            throw new IllegalArgumentException("Registry validity history is not append ordered");
-          }
-          previousRecorded = status.recordedAt;
-          binding.apply(status);
-        }
-      }
-
-      Binding selected = bindings.get(request.keyId());
-      return selected == null ? null : selected.resolved();
-    }
-
-    private static String text(JsonNode object, String field) {
-      JsonNode value = object.path(field);
-      if (!value.isTextual()) {
-        throw new IllegalArgumentException("Registry field is not text: " + field);
-      }
-      return value.textValue();
-    }
-
-    private static String optionalText(JsonNode object, String field) {
-      return object.has(field) ? text(object, field) : null;
-    }
-
-    private static ExactInstant optionalInstant(JsonNode object, String field) {
-      String value = optionalText(object, field);
-      return value == null ? null : ExactInstant.parse(value);
-    }
-
-    private static long positiveSafeInteger(JsonNode value) {
-      if (!value.isIntegralNumber() || !value.canConvertToLong()) {
-        throw new IllegalArgumentException("Registry sequence is not an integer");
-      }
-      long sequence = value.longValue();
-      if (sequence < 1 || sequence > MAX_SAFE_INTEGER) {
-        throw new IllegalArgumentException("Registry sequence is outside the safe range");
-      }
-      return sequence;
-    }
-
-    private static byte[] canonicalBase64(String text) {
-      byte[] bytes = Base64Url.decode(text);
-      if (!Base64Url.encode(bytes).equals(text)) {
-        throw new IllegalArgumentException("Registry public key is not canonical base64url");
-      }
-      return bytes;
-    }
-
-    private static final class Binding {
-      private final String keyId;
-      private final Principal principal;
-      private final String algorithm;
-      private final String publicKey;
-      private final String validFromText;
-      private final ExactInstant validFrom;
-      private final TreeMap<Long, Status> history;
-      private String validUntilText;
-      private ExactInstant validUntil;
-      private String revokedAtText;
-      private ExactInstant revokedAt;
-
-      private Binding(
-          String keyId,
-          Principal principal,
-          String algorithm,
-          String publicKey,
-          String validFromText,
-          ExactInstant validFrom,
-          TreeMap<Long, Status> history) {
-        this.keyId = keyId;
-        this.principal = principal;
-        this.algorithm = algorithm;
-        this.publicKey = publicKey;
-        this.validFromText = validFromText;
-        this.validFrom = validFrom;
-        this.history = history;
-      }
-
-      private boolean sameImmutable(Binding other) {
-        return principal.equals(other.principal)
-            && algorithm.equals(other.algorithm)
-            && publicKey.equals(other.publicKey)
-            && validFrom.equals(other.validFrom);
-      }
-
-      private void apply(Status status) {
-        if (status.validUntil != null) {
-          if (validUntil != null && status.validUntil.compareTo(validUntil) > 0) {
-            throw new IllegalArgumentException("Registry moves validUntil later");
-          }
-          validUntil = status.validUntil;
-          validUntilText = status.validUntilText;
-        }
-        if (status.revokedAt != null) {
-          if (revokedAt != null && status.revokedAt.compareTo(revokedAt) > 0) {
-            throw new IllegalArgumentException("Registry moves revokedAt later");
-          }
-          revokedAt = status.revokedAt;
-          revokedAtText = status.revokedAtText;
-        }
-      }
-
-      private ResolvedKey resolved() {
-        return new ResolvedKey(
-            keyId, principal, algorithm, publicKey, validFromText, validUntilText, revokedAtText);
-      }
-    }
-
-    private record Status(
-        long sequence,
-        ExactInstant recordedAt,
-        String validUntilText,
-        ExactInstant validUntil,
-        String revokedAtText,
-        ExactInstant revokedAt) {
-      private Status {
-        Objects.requireNonNull(recordedAt, "recordedAt");
-      }
-    }
-  }
 }

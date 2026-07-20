@@ -7,8 +7,7 @@ import java.util.Objects;
 import org.missionweaveprotocol.sdk.Base64Url;
 import org.missionweaveprotocol.sdk.CanonicalJson;
 import org.missionweaveprotocol.sdk.Ed25519;
-import org.missionweaveprotocol.sdk.Principal;
-import org.missionweaveprotocol.sdk.ResolvedKey;
+import org.missionweaveprotocol.sdk.KeyRegistrySnapshot;
 import org.missionweaveprotocol.sdk.SignedDocumentCodec;
 import org.missionweaveprotocol.sdk.SignedDocumentKind;
 import org.missionweaveprotocol.sdk.SigningKey;
@@ -28,18 +27,22 @@ public final class ValidateAndSignExample {
             org.missionweaveprotocol.sdk.StrictJson.parse(
                 resource("cryptography/vectors/signed-documents/valid/command.json"));
     command.remove("signature");
+    var signingFixture =
+        org.missionweaveprotocol.sdk.StrictJson.parse(
+            resource("cryptography/keys/signing-coordinator.json"));
+    byte[] registry = resource("cryptography/keys/registry-valid.json");
 
-    Ed25519.EncodedKeyPair keys = Ed25519.generateKeyPair();
     SigningKey signingKey =
         new SigningKey() {
           @Override
           public String keyId() {
-            return "urn:missionweaveprotocol:key:example";
+            return signingFixture.path("keyId").textValue();
           }
 
           @Override
           public byte[] sign(byte[] signingBytes) {
-            return Base64Url.decode(Ed25519.sign(signingBytes, keys.privateKey()));
+            return Base64Url.decode(
+                Ed25519.sign(signingBytes, signingFixture.path("seed").textValue()));
           }
         };
     SignedDocumentCodec codec = new SignedDocumentCodec();
@@ -49,16 +52,7 @@ public final class ValidateAndSignExample {
         codec.verify(
             SignedDocumentKind.COMMAND,
             encoded,
-            request ->
-                new ResolvedKey(
-                    request.keyId(),
-                    new Principal(
-                        "agent", "urn:missionweaveprotocol:agent:crypto-vector-coordinator"),
-                    "Ed25519",
-                    keys.publicKey(),
-                    "2026-01-01T00:00:00Z",
-                    null,
-                    null));
+            request -> KeyRegistrySnapshot.organizationWide(registry));
 
     output.println("Validated command.schema.json");
     output.println("Signature verified: " + verified.resolvedPrincipal().type().equals("agent"));
