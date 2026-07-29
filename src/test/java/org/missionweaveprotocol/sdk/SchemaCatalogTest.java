@@ -65,6 +65,17 @@ class SchemaCatalogTest {
         commandWithActionId(command, "https://example.test/actions/%E4%BE%8B"));
     catalog.validate(
         "command.schema.json", commandWithActionId(command, "https://example.test/?q=%5Bx%5D"));
+    catalog.validate("command.schema.json", commandWithActionId(command, "example:#fragment"));
+    catalog.validate("command.schema.json", commandWithActionId(command, "x://"));
+    catalog.validate("command.schema.json", commandWithActionId(command, "x://[vF.a:b]/"));
+    catalog.validate("command.schema.json", commandWithActionId(command, "x://[v1.!$&'()*+,;=:]/"));
+    catalog.validate(
+        "command.schema.json", commandWithActionId(command, "x://[::ffff:192.168.1.1]/"));
+    catalog.validate("command.schema.json", commandWithActionId(command, "http://example.test:/"));
+    catalog.validate(
+        "command.schema.json", commandWithActionId(command, "http://example.test:999999/"));
+    catalog.validate(
+        "command.schema.json", commandWithActionId(command, "https://user%40name@example.test/"));
 
     assertThrows(
         SchemaValidationException.class,
@@ -73,7 +84,23 @@ class SchemaCatalogTest {
                 "command.schema.json",
                 commandWithActionId(command, "https://example.test/?q=[x]")));
     for (String invalidActionId :
-        new String[] {"example:%", "example:%Z", "example:%ZZ", "https://example.test/?q=%GG"}) {
+        new String[] {
+          "example:%",
+          "example:%Z",
+          "example:%ZZ",
+          "https://example.test/?q=%GG",
+          "https://user@@example.test/",
+          "https://example.test:abc/",
+          "x://host:+1",
+          "x://host:%31",
+          "x://host:-1",
+          "x://host:1:2",
+          "x://[fe80::1%25eth0]/",
+          "x://[::ffff:192.168.001.1]/",
+          "x://[::ffff:192.168.01.1]/",
+          "x://[::ffff:192.168.1.01]/",
+          "x:a[b"
+        }) {
       assertThrows(
           SchemaValidationException.class,
           () ->

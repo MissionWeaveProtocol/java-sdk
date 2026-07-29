@@ -27,7 +27,7 @@ REQUIRED_README_TEXT = (
     "org.missionweaveprotocol",
     "missionweaveprotocol-sdk",
     "0.1.0-SNAPSHOT",
-    "70c4954b7eda5e38a1218ce5365ab2a281443dc4",
+    "8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a",
     "FrameCodec",
     "SchemaCatalog",
     "DocumentSignatures",
@@ -43,7 +43,7 @@ REQUIRED_README_TEXT = (
     "Apache-2.0",
 )
 REQUIRED_CONFORMANCE_TEXT = (
-    "70c4954b7eda5e38a1218ce5365ab2a281443dc4",
+    "8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a",
     "62 cryptography evaluations",
     "12 complete and 50 rejected",
     "every complete Registry identifier",

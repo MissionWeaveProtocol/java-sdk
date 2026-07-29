@@ -9,10 +9,11 @@ import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.dialect.Dialect;
 import com.networknt.schema.dialect.Draft202012;
 import com.networknt.schema.format.Format;
-import com.networknt.schema.format.UriFormat;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -52,7 +54,6 @@ public final class SchemaCatalog {
           }
         }
       };
-  private static final Format STANDARD_URI_FORMAT = new UriFormat();
   private static final Format URI_FORMAT =
       new Format() {
         @Override
@@ -223,17 +224,263 @@ public final class SchemaCatalog {
   }
 
   static boolean isProtocolUri(String value) {
-    if (!isVisibleAscii(value)) {
+    if (!isVisibleAscii(value) || !hasValidPercentTriplets(value)) {
       return false;
     }
     var scheme = URI_SCHEME.matcher(value);
     if (!scheme.lookingAt()) {
       return false;
     }
-    if (scheme.end() == value.length()) {
+
+    int colon = scheme.end() - 1;
+    int fragmentDelimiter = value.indexOf('#', colon + 1);
+    int beforeFragmentEnd = fragmentDelimiter == -1 ? value.length() : fragmentDelimiter;
+    int queryDelimiter = value.indexOf('?', colon + 1);
+    boolean hasQuery = queryDelimiter != -1 && queryDelimiter < beforeFragmentEnd;
+    int hierPartEnd = hasQuery ? queryDelimiter : beforeFragmentEnd;
+    if (!isValidHierPart(value.substring(colon + 1, hierPartEnd))) {
+      return false;
+    }
+    if (hasQuery
+        && !isValidQueryOrFragment(value.substring(queryDelimiter + 1, beforeFragmentEnd))) {
+      return false;
+    }
+    return fragmentDelimiter == -1
+        || isValidQueryOrFragment(value.substring(fragmentDelimiter + 1));
+  }
+
+  private static boolean hasValidPercentTriplets(String value) {
+    for (int index = 0; index < value.length(); index++) {
+      if (value.charAt(index) != '%') {
+        continue;
+      }
+      if (index + 2 >= value.length()
+          || !isHexDigit(value.charAt(index + 1))
+          || !isHexDigit(value.charAt(index + 2))) {
+        return false;
+      }
+      index += 2;
+    }
+    return true;
+  }
+
+  private static boolean isValidHierPart(String hierPart) {
+    if (hierPart.startsWith("//")) {
+      int pathStart = hierPart.indexOf('/', 2);
+      String authority = pathStart == -1 ? hierPart.substring(2) : hierPart.substring(2, pathStart);
+      String path = pathStart == -1 ? "" : hierPart.substring(pathStart);
+      return isValidAuthority(authority) && isValidPathAbempty(path);
+    }
+    if (hierPart.isEmpty()) {
       return true;
     }
-    return STANDARD_URI_FORMAT.matches(null, value);
+    return hierPart.charAt(0) == '/'
+        ? isValidPathAbsolute(hierPart)
+        : isValidPathRootless(hierPart);
+  }
+
+  private static boolean isValidAuthority(String authority) {
+    String hostPort = authority;
+    int at = authority.indexOf('@');
+    if (at != -1) {
+      if (authority.indexOf('@', at + 1) != -1
+          || !componentMatches(
+              authority.substring(0, at),
+              character ->
+                  isUnreserved(character) || isSubDelimiter(character) || character == ':')) {
+        return false;
+      }
+      hostPort = authority.substring(at + 1);
+    }
+
+    if (hostPort.startsWith("[")) {
+      int close = hostPort.indexOf(']');
+      if (close <= 1
+          || hostPort.indexOf('[', 1) != -1
+          || hostPort.indexOf(']', close + 1) != -1
+          || !isIpLiteral(hostPort.substring(1, close))) {
+        return false;
+      }
+      String remainder = hostPort.substring(close + 1);
+      return remainder.isEmpty()
+          || (remainder.charAt(0) == ':' && isValidPort(remainder.substring(1)));
+    }
+
+    if (hostPort.indexOf('[') != -1 || hostPort.indexOf(']') != -1) {
+      return false;
+    }
+
+    String host = hostPort;
+    String port = "";
+    int colon = hostPort.indexOf(':');
+    if (colon != -1) {
+      if (hostPort.indexOf(':', colon + 1) != -1) {
+        return false;
+      }
+      host = hostPort.substring(0, colon);
+      port = hostPort.substring(colon + 1);
+    }
+    return componentMatches(host, character -> isUnreserved(character) || isSubDelimiter(character))
+        && isValidPort(port);
+  }
+
+  private static boolean isIpLiteral(String value) {
+    return isIpvFuture(value) || isIpv6Address(value);
+  }
+
+  private static boolean isIpvFuture(String value) {
+    if (value.length() < 4 || (value.charAt(0) != 'v' && value.charAt(0) != 'V')) {
+      return false;
+    }
+    int dot = value.indexOf('.', 1);
+    if (dot <= 1 || dot + 1 == value.length()) {
+      return false;
+    }
+    for (int index = 1; index < dot; index++) {
+      if (!isHexDigit(value.charAt(index))) {
+        return false;
+      }
+    }
+    for (int index = dot + 1; index < value.length(); index++) {
+      int character = value.charAt(index);
+      if (!isUnreserved(character) && !isSubDelimiter(character) && character != ':') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean isIpv6Address(String value) {
+    if (value.indexOf(':') == -1 || value.indexOf('%') != -1) {
+      return false;
+    }
+    String embeddedIpv4 = value.substring(value.lastIndexOf(':') + 1);
+    if (embeddedIpv4.indexOf('.') != -1 && !isIpv4Address(embeddedIpv4)) {
+      return false;
+    }
+    try {
+      InetAddress.getByName(value);
+      return true;
+    } catch (UnknownHostException error) {
+      return false;
+    }
+  }
+
+  private static boolean isIpv4Address(String value) {
+    String[] octets = value.split("\\.", -1);
+    if (octets.length != 4) {
+      return false;
+    }
+    for (String octet : octets) {
+      if (octet.isEmpty() || (octet.length() > 1 && octet.charAt(0) == '0')) {
+        return false;
+      }
+      for (int index = 0; index < octet.length(); index++) {
+        if (!isDigit(octet.charAt(index))) {
+          return false;
+        }
+      }
+      if (octet.length() > 3 || Integer.parseInt(octet) > 255) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean isValidPort(String value) {
+    for (int index = 0; index < value.length(); index++) {
+      if (!isDigit(value.charAt(index))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean isValidPathAbempty(String value) {
+    return (value.isEmpty() || value.charAt(0) == '/')
+        && componentMatches(value, character -> isPchar(character) || character == '/');
+  }
+
+  private static boolean isValidPathAbsolute(String value) {
+    if (value.isEmpty() || value.charAt(0) != '/') {
+      return false;
+    }
+    if (value.length() == 1) {
+      return true;
+    }
+    return value.charAt(1) != '/'
+        && componentMatches(
+            value.substring(1), character -> isPchar(character) || character == '/');
+  }
+
+  private static boolean isValidPathRootless(String value) {
+    return !value.isEmpty()
+        && value.charAt(0) != '/'
+        && componentMatches(value, character -> isPchar(character) || character == '/');
+  }
+
+  private static boolean isValidQueryOrFragment(String value) {
+    return componentMatches(
+        value, character -> isPchar(character) || character == '/' || character == '?');
+  }
+
+  private static boolean componentMatches(String value, IntPredicate allowed) {
+    for (int index = 0; index < value.length(); ) {
+      int character = value.charAt(index);
+      if (character == '%') {
+        if (index + 2 >= value.length()
+            || !isHexDigit(value.charAt(index + 1))
+            || !isHexDigit(value.charAt(index + 2))) {
+          return false;
+        }
+        index += 3;
+        continue;
+      }
+      if (!allowed.test(character)) {
+        return false;
+      }
+      index++;
+    }
+    return true;
+  }
+
+  private static boolean isPchar(int value) {
+    return isUnreserved(value) || isSubDelimiter(value) || value == ':' || value == '@';
+  }
+
+  private static boolean isUnreserved(int value) {
+    return isAlpha(value)
+        || isDigit(value)
+        || value == '-'
+        || value == '.'
+        || value == '_'
+        || value == '~';
+  }
+
+  private static boolean isSubDelimiter(int value) {
+    return value == '!'
+        || value == '$'
+        || value == '&'
+        || value == '\''
+        || value == '('
+        || value == ')'
+        || value == '*'
+        || value == '+'
+        || value == ','
+        || value == ';'
+        || value == '=';
+  }
+
+  private static boolean isAlpha(int value) {
+    return (value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z');
+  }
+
+  private static boolean isDigit(int value) {
+    return value >= '0' && value <= '9';
+  }
+
+  private static boolean isHexDigit(int value) {
+    return isDigit(value) || (value >= 'A' && value <= 'F') || (value >= 'a' && value <= 'f');
   }
 
   private static boolean isVisibleAscii(String value) {
