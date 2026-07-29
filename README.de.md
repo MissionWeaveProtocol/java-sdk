@@ -28,9 +28,10 @@ Das offizielle Java-21-SDK zum Validieren, Kanonisieren, Signieren und Testen vo
 | SDK-Koordinaten | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Protokollversion | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Protokoll-Commit | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
+| Protokoll-Commit | [`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4) |
 | JSON-Schemata | 21 |
 | Konformitätsvektoren | 56: 26 gültig und 30 ungültig |
+| Kryptografie-Auswertungen | [62](cryptography/README.md) |
 
 Das JAR enthält das vollständige Offline-Bündel. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 dokumentiert Quelle, Dateianzahlen und SHA-256-Baum-Digests.

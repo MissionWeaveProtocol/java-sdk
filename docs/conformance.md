@@ -5,7 +5,7 @@
 SDK version `0.1.0-SNAPSHOT` targets MissionWeaveProtocol `0.1` and the wire
 namespace `missionweaveprotocol`. The vendored bundle is pinned to protocol
 commit
-[`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40).
+[`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4).
 
 `PROTOCOL_PIN.json` records the authoritative source, file counts, and SHA-256
 tree digests:
@@ -19,8 +19,8 @@ tree digests:
 The 57 conformance files are one manifest plus 56 vectors: 26 expected-valid
 documents and 30 expected-invalid documents.
 
-The independently pinned cryptography bundle adds nine Signed Document profiles, 22 cases, and 58
-evaluations: 12 complete and 46 rejected at their first normative semantic stage.
+The independently pinned cryptography bundle adds nine Signed Document profiles, 22 cases, and 62
+evaluations: 12 complete and 50 rejected at their first normative semantic stage.
 
 ## What the runner checks
 
@@ -32,7 +32,7 @@ evaluations: 12 complete and 46 rejected at their first normative semantic stage
 - the validator does not enable remote schema fetching;
 - JSON Schema format assertions are enabled;
 - each manifest entry is checked against its named schema and expected validity;
-- `SignedDocumentCodec` is exercised against all 58 cryptography evaluations, including strict
+- `SignedDocumentCodec` is exercised against all 62 cryptography evaluations, including strict
   Ed25519 point/scalar encodings, exact timestamps, Registry validity, JCS bytes, and hashes;
 - the source tree, compiled classpath, built JAR, and installed Maven consumer
   are exercised independently.
@@ -42,7 +42,9 @@ For Signed Document stage 4, the SDK tests the complete Registry-evidence path:
 - the completeness gate rejects null snapshots, `PARTIAL`, `UNSPECIFIED`, unavailable evidence,
   and empty Registry bytes;
 - strict Registry JSON parsing rejects invalid UTF-8, byte-order marks, duplicate members, and
-  trailing data, then checks the exact root and binding shapes and absolute identifiers;
+  trailing data, then checks the exact root and binding shapes;
+- every complete Registry identifier, including identifiers in unrelated bindings, is validated
+  before key selection;
 - every binding is validated, including unrelated bindings, with canonical 32-byte Ed25519 keys
   and strict non-identity, on-curve, prime-order point checks;
 - global indexes enforce immutable key-ID bindings, unique public-key ownership, and no aliases
@@ -105,7 +107,7 @@ packaged resources, runs all 56 vectors, and decodes a schema-valid frame.
 
 ## Deliberate limits
 
-The Java SDK claims **schema-and-vector conformance only**. A `56/56` schema result plus all 58
+The Java SDK claims **schema-and-vector conformance only**. A `56/56` schema result plus all 62
 cryptography evaluations does
 not establish complete MissionWeaveProtocol conformance.
 

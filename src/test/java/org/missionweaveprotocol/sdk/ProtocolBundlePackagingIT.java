@@ -33,6 +33,13 @@ class ProtocolBundlePackagingIT {
         JarFile jar = new JarFile(jarPath.toFile())) {
       ProtocolBundle.Verification verification = ProtocolBundle.verifyPackaged(loader);
       assertEquals(ProtocolBundle.BUNDLE_SHA256, verification.bundleSha256());
+      ProtocolBundle.CryptographyVerification cryptography =
+          ProtocolBundle.verifyPackagedCryptographyBundle(loader);
+      assertEquals(
+          ProtocolBundle.CRYPTOGRAPHY_ARTIFACT_DIGEST, cryptography.artifactDigest());
+      assertEquals(ProtocolBundle.CRYPTOGRAPHY_ARTIFACT_COUNT, cryptography.artifactCount());
+      assertEquals(ProtocolBundle.CRYPTOGRAPHY_CASE_COUNT, cryptography.caseCount());
+      assertEquals(ProtocolBundle.CRYPTOGRAPHY_EVALUATION_COUNT, cryptography.evaluationCount());
 
       assertNotNull(jar.getJarEntry(ProtocolBundle.PIN_RESOURCE));
       assertNotNull(jar.getJarEntry(ProtocolBundle.INDEX_RESOURCE));

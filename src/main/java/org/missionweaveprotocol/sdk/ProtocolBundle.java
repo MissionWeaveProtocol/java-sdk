@@ -34,7 +34,7 @@ public final class ProtocolBundle {
       "https://github.com/missionweaveprotocol/missionweaveprotocol";
 
   /** Exact source commit recorded by the protocol pin. */
-  public static final String COMMIT = "33e47ad8a7318f942de77fb72dbb054d85881b40";
+  public static final String COMMIT = "70c4954b7eda5e38a1218ce5365ab2a281443dc4";
 
   /** Protocol version recorded by the protocol pin. */
   public static final String PROTOCOL_VERSION = "0.1";
@@ -59,7 +59,7 @@ public final class ProtocolBundle {
 
   /** Source commit of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_SOURCE_COMMIT =
-      "235aee85ba88934641822e1639e08efd2c9e29b6";
+      "70c4954b7eda5e38a1218ce5365ab2a281443dc4";
 
   /** Profile ID of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_PROFILE_ID =
@@ -70,16 +70,16 @@ public final class ProtocolBundle {
 
   /** Artifact digest of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_ARTIFACT_DIGEST =
-      "sha256:159a4900987723537d0d110ec6724c5e1ee52854951a9c69278386d751baae08";
+      "sha256:5eade516e4bc5dcf04477727ebcccd11f33348b2d9135fb6fe0365c6e6cc2ea3";
 
   /** Number of digest-protected artifacts in the cryptography manifest. */
-  public static final int CRYPTOGRAPHY_ARTIFACT_COUNT = 94;
+  public static final int CRYPTOGRAPHY_ARTIFACT_COUNT = 98;
 
   /** Number of cases in the cryptography manifest. */
   public static final int CRYPTOGRAPHY_CASE_COUNT = 22;
 
   /** Number of evaluations in the cryptography manifest. */
-  public static final int CRYPTOGRAPHY_EVALUATION_COUNT = 58;
+  public static final int CRYPTOGRAPHY_EVALUATION_COUNT = 62;
 
   static final String PIN_RESOURCE = "PROTOCOL_PIN.json";
   static final String INDEX_RESOURCE = "META-INF/missionweaveprotocol/protocol-bundle.index";

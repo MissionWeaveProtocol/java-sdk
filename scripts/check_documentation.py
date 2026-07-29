@@ -27,7 +27,7 @@ REQUIRED_README_TEXT = (
     "org.missionweaveprotocol",
     "missionweaveprotocol-sdk",
     "0.1.0-SNAPSHOT",
-    "33e47ad8a7318f942de77fb72dbb054d85881b40",
+    "70c4954b7eda5e38a1218ce5365ab2a281443dc4",
     "FrameCodec",
     "SchemaCatalog",
     "DocumentSignatures",
@@ -36,9 +36,19 @@ REQUIRED_README_TEXT = (
     "ORGANIZATION_WIDE",
     "ConformanceRunner",
     "56/56",
+    "cryptography/README.md",
+    "62",
     "docs/usage.md",
     "docs/conformance.md",
     "Apache-2.0",
+)
+REQUIRED_CONFORMANCE_TEXT = (
+    "70c4954b7eda5e38a1218ce5365ab2a281443dc4",
+    "62 cryptography evaluations",
+    "12 complete and 50 rejected",
+    "every complete Registry identifier",
+    "including identifiers in unrelated bindings",
+    "before key selection",
 )
 FENCE_PATTERN = re.compile(r"^```[^\n]*\n(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
 LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -49,6 +59,13 @@ def main() -> None:
     for relative in REQUIRED_FILES:
         if not (ROOT / relative).is_file():
             failures.append(f"missing required documentation asset: {relative}")
+
+    conformance_path = ROOT / "docs/conformance.md"
+    if conformance_path.is_file():
+        conformance = conformance_path.read_text(encoding="utf-8")
+        for required in REQUIRED_CONFORMANCE_TEXT:
+            if required not in conformance:
+                failures.append(f"docs/conformance.md: missing required text {required!r}")
 
     documents: dict[str, str] = {}
     for filename, switcher in READMES.items():

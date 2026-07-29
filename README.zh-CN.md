@@ -28,9 +28,10 @@
 | SDK 坐标 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | 协议版本 | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| 协议 commit | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
+| 协议 commit | [`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4) |
 | JSON Schema | 21 个 |
 | 符合性向量 | 56 个：26 个有效，30 个无效 |
+| 密码学评估 | [62](cryptography/README.md) |
 
 JAR 包含完整的离线产物包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 记录其来源、文件数量和 SHA-256 树摘要。
