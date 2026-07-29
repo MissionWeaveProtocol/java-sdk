@@ -35,8 +35,7 @@ class ProtocolBundlePackagingIT {
       assertEquals(ProtocolBundle.BUNDLE_SHA256, verification.bundleSha256());
       ProtocolBundle.CryptographyVerification cryptography =
           ProtocolBundle.verifyPackagedCryptographyBundle(loader);
-      assertEquals(
-          ProtocolBundle.CRYPTOGRAPHY_ARTIFACT_DIGEST, cryptography.artifactDigest());
+      assertEquals(ProtocolBundle.CRYPTOGRAPHY_ARTIFACT_DIGEST, cryptography.artifactDigest());
       assertEquals(ProtocolBundle.CRYPTOGRAPHY_ARTIFACT_COUNT, cryptography.artifactCount());
       assertEquals(ProtocolBundle.CRYPTOGRAPHY_CASE_COUNT, cryptography.caseCount());
       assertEquals(ProtocolBundle.CRYPTOGRAPHY_EVALUATION_COUNT, cryptography.evaluationCount());
