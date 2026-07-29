@@ -28,7 +28,7 @@ datos de [MissionWeaveProtocol](https://github.com/missionweaveprotocol/missionw
 | Coordenadas del SDK | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Versión del protocolo | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Commit del protocolo | [`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4) |
+| Commit del protocolo | [`8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a) |
 | JSON Schema | 21 |
 | Vectores de conformidad | 56: 26 válidos y 30 no válidos |
 | Evaluaciones criptográficas | [62](cryptography/README.md) |

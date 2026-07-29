@@ -86,13 +86,13 @@ public final class Consumer {
 
   public static void main(String[] arguments) throws Exception {
     var bundle = ProtocolBundle.verifyPackaged();
-    if (!bundle.protocolCommit().equals("70c4954b7eda5e38a1218ce5365ab2a281443dc4")
+    if (!bundle.protocolCommit().equals("8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a")
         || bundle.schemaFiles() != 21
         || bundle.conformanceFiles() != 57) {
       throw new IllegalStateException("Installed protocol bundle is incomplete");
     }
     var cryptography = ProtocolBundle.verifyPackagedCryptographyBundle();
-    if (!cryptography.sourceCommit().equals("70c4954b7eda5e38a1218ce5365ab2a281443dc4")
+    if (!cryptography.sourceCommit().equals("8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a")
         || !cryptography
             .artifactDigest()
             .equals("sha256:5eade516e4bc5dcf04477727ebcccd11f33348b2d9135fb6fe0365c6e6cc2ea3")

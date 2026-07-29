@@ -29,7 +29,7 @@ The official Java 21 SDK for validating, canonicalizing, signing, and testing
 | SDK coordinates | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Protocol version | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Protocol commit | [`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4) |
+| Protocol commit | [`8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a) |
 | JSON Schemas | 21 |
 | Conformance vectors | 56: 26 valid and 30 invalid |
 | Cryptography evaluations | [62](cryptography/README.md) |

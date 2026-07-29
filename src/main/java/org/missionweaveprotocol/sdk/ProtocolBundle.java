@@ -34,7 +34,7 @@ public final class ProtocolBundle {
       "https://github.com/missionweaveprotocol/missionweaveprotocol";
 
   /** Exact source commit recorded by the protocol pin. */
-  public static final String COMMIT = "70c4954b7eda5e38a1218ce5365ab2a281443dc4";
+  public static final String COMMIT = "8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a";
 
   /** Protocol version recorded by the protocol pin. */
   public static final String PROTOCOL_VERSION = "0.1";
@@ -59,7 +59,7 @@ public final class ProtocolBundle {
 
   /** Source commit of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_SOURCE_COMMIT =
-      "70c4954b7eda5e38a1218ce5365ab2a281443dc4";
+      "8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a";
 
   /** Profile ID of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_PROFILE_ID =

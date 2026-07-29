@@ -28,7 +28,7 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | 協定版本 | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| 協定 commit | [`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4) |
+| 協定 commit | [`8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/8a67bd2acdb9f0d6f7ac3a2f99a1fd01611ab74a) |
 | JSON Schema | 21 個 |
 | 符合性向量 | 56 個：26 個有效，30 個無效 |
 | 密碼學評估 | [62](cryptography/README.md) |
