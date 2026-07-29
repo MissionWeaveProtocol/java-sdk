@@ -270,12 +270,29 @@ class SignedDocumentCodecRegistryTest {
         "example:%Z",
         "example:%ZZ",
         "https://example.test/?q=%GG",
-        "https://example.test/?q=[x]");
+        "https://example.test/?q=[x]",
+        "https://user@@example.test/",
+        "https://example.test:abc/",
+        "x://host:+1",
+        "x://host:%31",
+        "x://host:-1",
+        "x://host:1:2",
+        "x://[fe80::1%25eth0]/",
+        "x:a[b");
   }
 
   private static Stream<String> validProtocolUris() {
     return Stream.of(
-        "example:", "https://example.test/actions/%E4%BE%8B", "https://example.test/?q=%5Bx%5D");
+        "example:",
+        "example:#fragment",
+        "x://",
+        "x://[vF.a:b]/",
+        "x://[v1.!$&'()*+,;=:]/",
+        "http://example.test:/",
+        "http://example.test:999999/",
+        "https://user%40name@example.test/",
+        "https://example.test/actions/%E4%BE%8B",
+        "https://example.test/?q=%5Bx%5D");
   }
 
   private static byte[] resource(String name) throws IOException {
