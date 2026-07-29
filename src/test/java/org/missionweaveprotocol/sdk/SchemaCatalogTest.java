@@ -69,6 +69,8 @@ class SchemaCatalogTest {
     catalog.validate("command.schema.json", commandWithActionId(command, "x://"));
     catalog.validate("command.schema.json", commandWithActionId(command, "x://[vF.a:b]/"));
     catalog.validate("command.schema.json", commandWithActionId(command, "x://[v1.!$&'()*+,;=:]/"));
+    catalog.validate(
+        "command.schema.json", commandWithActionId(command, "x://[::ffff:192.168.1.1]/"));
     catalog.validate("command.schema.json", commandWithActionId(command, "http://example.test:/"));
     catalog.validate(
         "command.schema.json", commandWithActionId(command, "http://example.test:999999/"));
@@ -94,6 +96,9 @@ class SchemaCatalogTest {
           "x://host:-1",
           "x://host:1:2",
           "x://[fe80::1%25eth0]/",
+          "x://[::ffff:192.168.001.1]/",
+          "x://[::ffff:192.168.01.1]/",
+          "x://[::ffff:192.168.1.01]/",
           "x:a[b"
         }) {
       assertThrows(

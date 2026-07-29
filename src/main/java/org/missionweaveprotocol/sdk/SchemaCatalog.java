@@ -354,12 +354,37 @@ public final class SchemaCatalog {
     if (value.indexOf(':') == -1 || value.indexOf('%') != -1) {
       return false;
     }
+    String embeddedIpv4 = value.substring(value.lastIndexOf(':') + 1);
+    if (embeddedIpv4.indexOf('.') != -1 && !isIpv4Address(embeddedIpv4)) {
+      return false;
+    }
     try {
       InetAddress.getByName(value);
       return true;
     } catch (UnknownHostException error) {
       return false;
     }
+  }
+
+  private static boolean isIpv4Address(String value) {
+    String[] octets = value.split("\\.", -1);
+    if (octets.length != 4) {
+      return false;
+    }
+    for (String octet : octets) {
+      if (octet.isEmpty() || (octet.length() > 1 && octet.charAt(0) == '0')) {
+        return false;
+      }
+      for (int index = 0; index < octet.length(); index++) {
+        if (!isDigit(octet.charAt(index))) {
+          return false;
+        }
+      }
+      if (octet.length() > 3 || Integer.parseInt(octet) > 255) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private static boolean isValidPort(String value) {

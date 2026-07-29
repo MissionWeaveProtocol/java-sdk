@@ -278,6 +278,9 @@ class SignedDocumentCodecRegistryTest {
         "x://host:-1",
         "x://host:1:2",
         "x://[fe80::1%25eth0]/",
+        "x://[::ffff:192.168.001.1]/",
+        "x://[::ffff:192.168.01.1]/",
+        "x://[::ffff:192.168.1.01]/",
         "x:a[b");
   }
 
@@ -288,6 +291,7 @@ class SignedDocumentCodecRegistryTest {
         "x://",
         "x://[vF.a:b]/",
         "x://[v1.!$&'()*+,;=:]/",
+        "x://[::ffff:192.168.1.1]/",
         "http://example.test:/",
         "http://example.test:999999/",
         "https://user%40name@example.test/",
