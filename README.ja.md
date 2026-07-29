@@ -27,9 +27,10 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | プロトコルバージョン | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| プロトコル commit | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
+| プロトコル commit | [`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4) |
 | JSON Schema | 21 |
 | 適合性ベクトル | 56：有効 26、無効 30 |
+| 暗号評価 | [62](cryptography/README.md) |
 
 JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 に取得元、ファイル数、SHA-256 ツリーダイジェストを記録しています。

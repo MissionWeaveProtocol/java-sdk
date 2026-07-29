@@ -134,6 +134,7 @@ class SignedDocumentCodecTest {
     int evaluations = 0;
     int completed = 0;
     int rejected = 0;
+    int keyResolutionRejections = 0;
     int canonicalizationEvaluations = 0;
 
     for (JsonNode testCase : manifest.path("cases")) {
@@ -203,13 +204,17 @@ class SignedDocumentCodecTest {
               error.getMessage());
           assertNull(error.getCause());
           rejected++;
+          if (expected.path("stage").textValue().equals("key-resolution")) {
+            keyResolutionRejections++;
+          }
         }
       }
     }
 
-    assertEquals(58, evaluations);
+    assertEquals(62, evaluations);
     assertEquals(12, completed);
-    assertEquals(46, rejected);
+    assertEquals(50, rejected);
+    assertEquals(24, keyResolutionRejections);
     assertEquals(1, canonicalizationEvaluations);
   }
 

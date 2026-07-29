@@ -28,9 +28,10 @@ SDK Java 21 officiel pour valider, canonicaliser, signer et tester les données
 | Coordonnées du SDK | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Version du protocole | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Commit du protocole | [`33e47ad8a7318f942de77fb72dbb054d85881b40`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40) |
+| Commit du protocole | [`70c4954b7eda5e38a1218ce5365ab2a281443dc4`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/70c4954b7eda5e38a1218ce5365ab2a281443dc4) |
 | Schémas JSON | 21 |
 | Vecteurs de conformité | 56 : 26 valides et 30 invalides |
+| Évaluations cryptographiques | [62](cryptography/README.md) |
 
 Le JAR contient le paquet hors ligne complet. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 enregistre sa provenance, le nombre de fichiers et les empreintes SHA-256 de l’arbre.
