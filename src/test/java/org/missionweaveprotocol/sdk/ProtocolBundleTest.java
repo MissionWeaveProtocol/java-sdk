@@ -57,8 +57,7 @@ class ProtocolBundleTest {
 
   @Test
   void verifiesSourceAdmissionBundle() throws IOException {
-    ProtocolBundle.AdmissionVerification verification =
-        ProtocolBundle.verifyAdmissionBundle(ROOT);
+    ProtocolBundle.AdmissionVerification verification = ProtocolBundle.verifyAdmissionBundle(ROOT);
 
     assertAdmissionVerification(verification);
   }
@@ -134,8 +133,7 @@ class ProtocolBundleTest {
     Files.writeString(
         manifest,
         Files.readString(manifest, StandardCharsets.UTF_8)
-            .replace(
-                "admission/records/valid/command.json", "../records/valid/command.json"),
+            .replace("admission/records/valid/command.json", "../records/valid/command.json"),
         StandardCharsets.UTF_8);
 
     IllegalStateException error =

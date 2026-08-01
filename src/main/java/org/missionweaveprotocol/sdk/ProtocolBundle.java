@@ -86,8 +86,7 @@ public final class ProtocolBundle {
   public static final String ADMISSION_PATH = "admission/manifest.json";
 
   /** Source commit of the pinned Admission bundle. */
-  public static final String ADMISSION_SOURCE_COMMIT =
-      "f7e70a72c76bbeb5014c186cd820aac2112f0dde";
+  public static final String ADMISSION_SOURCE_COMMIT = "f7e70a72c76bbeb5014c186cd820aac2112f0dde";
 
   /** Profile ID of the pinned Admission bundle. */
   public static final String ADMISSION_PROFILE_ID =
@@ -366,8 +365,7 @@ public final class ProtocolBundle {
         "admission.cryptographyArtifactDigest",
         ADMISSION_CRYPTOGRAPHY_ARTIFACT_DIGEST,
         admission.cryptographyArtifactDigest());
-    requireEqual(
-        "admission.artifactDigest", ADMISSION_ARTIFACT_DIGEST, admission.artifactDigest());
+    requireEqual("admission.artifactDigest", ADMISSION_ARTIFACT_DIGEST, admission.artifactDigest());
     requireCount("admission.artifactCount", ADMISSION_ARTIFACT_COUNT, admission.artifactCount());
     requireCount("admission.caseCount", ADMISSION_CASE_COUNT, admission.caseCount());
     requireCount(

@@ -12,8 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class AdmissionServiceTest {
-  private static final String ADMISSION_SERVICE_ID =
-      "urn:missionweaveprotocol:service:admission";
+  private static final String ADMISSION_SERVICE_ID = "urn:missionweaveprotocol:service:admission";
 
   @Test
   void firstAdmissionReturnsOnlyAfterCommittedRecordValidation() throws Exception {
@@ -24,11 +23,7 @@ class AdmissionServiceTest {
     AdmittedSignedDocument admitted =
         new AdmissionService()
             .admitFirst(
-                SignedDocumentKind.COMMAND,
-                goldenCommand(),
-                currentRegistry(),
-                log,
-                context);
+                SignedDocumentKind.COMMAND, goldenCommand(), currentRegistry(), log, context);
 
     assertEquals(admitted.verified().signingHash(), admitted.record().signingHash());
     assertArrayEquals(committed, admitted.record().bytes());
@@ -61,10 +56,7 @@ class AdmissionServiceTest {
             () ->
                 new AdmissionService()
                     .verifyHistoricalAdmission(
-                        SignedDocumentKind.COMMAND,
-                        goldenCommand(),
-                        historicalRegistry(),
-                        log));
+                        SignedDocumentKind.COMMAND, goldenCommand(), historicalRegistry(), log));
 
     assertAdmission(error, AdmissionReason.RECORD_BINDING_MISMATCH);
     assertEquals(List.of("lookup"), log.calls());
@@ -123,10 +115,7 @@ class AdmissionServiceTest {
             () ->
                 new AdmissionService()
                     .verifyHistoricalAdmission(
-                        SignedDocumentKind.COMMAND,
-                        goldenCommand(),
-                        historicalRegistry(),
-                        log));
+                        SignedDocumentKind.COMMAND, goldenCommand(), historicalRegistry(), log));
 
     assertAdmission(error, AdmissionReason.RECORD_MISSING);
     assertEquals(List.of("lookup"), log.calls());

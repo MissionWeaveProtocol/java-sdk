@@ -28,8 +28,7 @@ public final class AdmissionService {
     AdmissionContextValue context;
     try {
       context =
-          trustedContext.issue(
-              verified.resolvedKey().organizationId(), verified.signingHash());
+          trustedContext.issue(verified.resolvedKey().organizationId(), verified.signingHash());
     } catch (AdmissionAdapterException error) {
       throw remap(error);
     }
@@ -129,13 +128,11 @@ public final class AdmissionService {
     throw failure(AdmissionReason.LOG_INDETERMINATE);
   }
 
-  private static AdmissionLookup lookup(
-      AdmissionLog admissionLog, VerifiedSignedDocument verified) throws AdmissionException {
+  private static AdmissionLookup lookup(AdmissionLog admissionLog, VerifiedSignedDocument verified)
+      throws AdmissionException {
     AdmissionLookup lookup;
     try {
-      lookup =
-          admissionLog.lookup(
-              verified.resolvedKey().organizationId(), verified.signingHash());
+      lookup = admissionLog.lookup(verified.resolvedKey().organizationId(), verified.signingHash());
     } catch (AdmissionAdapterException error) {
       throw remap(error);
     }
@@ -257,8 +254,7 @@ public final class AdmissionService {
     throw new IllegalArgumentException("Unknown First-Admission Record documentKind: " + id);
   }
 
-  private static boolean isEventSelfAnchoring(
-      byte[] recordBytes, VerifiedSignedDocument verified) {
+  private static boolean isEventSelfAnchoring(byte[] recordBytes, VerifiedSignedDocument verified) {
     if (verified.kind() != SignedDocumentKind.EVENT) {
       return false;
     }

@@ -42,8 +42,7 @@ class AdmissionConformanceTest {
           complete++;
         } catch (AdmissionException error) {
           assertEquals("admission", evaluation.path("expect").path("stage").textValue());
-          assertEquals(
-              evaluation.path("expect").path("wireCode").textValue(), error.wireCode());
+          assertEquals(evaluation.path("expect").path("wireCode").textValue(), error.wireCode());
           assertEquals(
               admissionReason(evaluation.path("expect").path("reason").textValue()),
               error.diagnostic().reason());
@@ -125,8 +124,7 @@ class AdmissionConformanceTest {
     }
   }
 
-  private static final class ManifestRegistry
-      implements KeyResolver, AdmissionCurrentKeyResolver {
+  private static final class ManifestRegistry implements KeyResolver, AdmissionCurrentKeyResolver {
     private final byte[] registry;
     private final List<String> calls;
 
@@ -222,17 +220,14 @@ class AdmissionConformanceTest {
       assertArrayEquals(
           canonicalize(
               resourceUnchecked(
-                  "admission/records/valid/"
-                      + evaluation.path("profileId").textValue()
-                      + ".json")),
+                  "admission/records/valid/" + evaluation.path("profileId").textValue() + ".json")),
           candidateBytes);
 
       JsonNode append = evaluation.path("append");
       assertNotNull(append);
       return switch (append.path("status").textValue()) {
         case "committed", "existing" ->
-            authenticated(
-                append.path("record").textValue(), append.path("authenticatedService"));
+            authenticated(append.path("record").textValue(), append.path("authenticatedService"));
         case "conflict" -> throw adapterFailure(AdmissionReason.RECORD_CONFLICT, append);
         case "unauthenticated" ->
             throw adapterFailure(AdmissionReason.LOG_AUTHENTICATION_FAILED, append);
