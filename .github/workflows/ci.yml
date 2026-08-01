@@ -35,7 +35,7 @@ jobs:
       - name: Check documentation
         run: python3 scripts/check_documentation.py
 
-      - name: Verify SDK
+      - name: Verify SDK, Admission conformance, and packaged JAR
         run: ./mvnw -B -ntp verify
 
       - name: Smoke-test installed SDK

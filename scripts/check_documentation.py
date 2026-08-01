@@ -27,28 +27,52 @@ REQUIRED_README_TEXT = (
     "org.missionweaveprotocol",
     "missionweaveprotocol-sdk",
     "0.1.0-SNAPSHOT",
-    "27c9f5c80cdcc1bd2179aae6247426f59e833525",
+    "f7e70a72c76bbeb5014c186cd820aac2112f0dde",
     "FrameCodec",
     "SchemaCatalog",
     "DocumentSignatures",
     "KeyResolver",
     "KeyRegistrySnapshot",
     "ORGANIZATION_WIDE",
+    "AdmissionService.admitFirst",
+    "AdmissionCurrentKeyResolver",
+    "verifyHistoricalAdmission",
+    "admission/README.md",
     "ConformanceRunner",
-    "56/56",
+    "58/58",
     "cryptography/README.md",
     "62",
+    "30",
     "docs/usage.md",
     "docs/conformance.md",
     "Apache-2.0",
 )
 REQUIRED_CONFORMANCE_TEXT = (
-    "27c9f5c80cdcc1bd2179aae6247426f59e833525",
+    "f7e70a72c76bbeb5014c186cd820aac2112f0dde",
+    "58 vectors",
     "62 cryptography evaluations",
     "12 complete and 50 rejected",
+    "30 Admission evaluations",
+    "12 complete and 18 rejected",
+    "AdmissionCurrentKeyResolver",
+    "verifyHistoricalAdmission",
+    "AUTH_INVALID_SIGNATURE",
+    "19/5/30",
     "every complete Registry identifier",
     "including identifiers in unrelated bindings",
     "before key selection",
+)
+REQUIRED_USAGE_TEXT = (
+    "22 bundled Draft 2020-12 schemas",
+    "58 structural conformance vectors",
+    "62-evaluation cryptography bundle",
+    "30-evaluation Admission bundle",
+    "AdmissionService",
+    "AdmissionCurrentKeyResolver",
+    "admitFirst",
+    "verifyHistoricalAdmission",
+    "AdmissionException",
+    "AUTH_INVALID_SIGNATURE",
 )
 FENCE_PATTERN = re.compile(r"^```[^\n]*\n(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
 LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -66,6 +90,13 @@ def main() -> None:
         for required in REQUIRED_CONFORMANCE_TEXT:
             if required not in conformance:
                 failures.append(f"docs/conformance.md: missing required text {required!r}")
+
+    usage_path = ROOT / "docs/usage.md"
+    if usage_path.is_file():
+        usage = usage_path.read_text(encoding="utf-8")
+        for required in REQUIRED_USAGE_TEXT:
+            if required not in usage:
+                failures.append(f"docs/usage.md: missing required text {required!r}")
 
     documents: dict[str, str] = {}
     for filename, switcher in READMES.items():

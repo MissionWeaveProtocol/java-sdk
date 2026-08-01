@@ -56,6 +56,22 @@ class ProtocolBundleTest {
   }
 
   @Test
+  void verifiesSourceAdmissionBundle() throws IOException {
+    ProtocolBundle.AdmissionVerification verification =
+        ProtocolBundle.verifyAdmissionBundle(ROOT);
+
+    assertAdmissionVerification(verification);
+  }
+
+  @Test
+  void verifiesPackagedAdmissionBundle() throws IOException {
+    ProtocolBundle.AdmissionVerification verification =
+        ProtocolBundle.verifyPackagedAdmissionBundle();
+
+    assertAdmissionVerification(verification);
+  }
+
+  @Test
   void packagedResourcesAreByteIdenticalToVendoredSources() throws IOException {
     for (String path : ProtocolBundle.resourcePaths(CLASS_LOADER)) {
       try (InputStream packaged = CLASS_LOADER.getResourceAsStream(path)) {
@@ -81,6 +97,86 @@ class ProtocolBundleTest {
         StreamSupport.stream(manifest.get("artifacts").spliterator(), false)
             .map(entry -> entry.get("path").textValue())
             .anyMatch("cryptography/README.md"::equals));
+  }
+
+  @Test
+  void admissionReadmeIsNotADigestProtectedArtifact() throws IOException {
+    JsonNode manifest =
+        StrictJson.parse(Files.readAllBytes(ROOT.resolve(ProtocolBundle.ADMISSION_PATH)));
+
+    assertFalse(
+        StreamSupport.stream(manifest.get("artifacts").spliterator(), false)
+            .map(entry -> entry.get("path").textValue())
+            .anyMatch("admission/README.md"::equals));
+  }
+
+  @Test
+  void rejectsTamperedAdmissionArtifact() throws IOException {
+    copyBundle(temporaryDirectory);
+    Files.writeString(
+        temporaryDirectory.resolve("admission/records/valid/command.json"),
+        " ",
+        StandardCharsets.UTF_8,
+        StandardOpenOption.APPEND);
+
+    IllegalStateException error =
+        assertThrows(
+            IllegalStateException.class,
+            () -> ProtocolBundle.verifyAdmissionBundle(temporaryDirectory));
+
+    assertTrue(error.getMessage().contains("byteLength mismatch:"));
+  }
+
+  @Test
+  void rejectsUnsafeAdmissionArtifactPathBeforeReadingIt() throws IOException {
+    copyBundle(temporaryDirectory);
+    Path manifest = temporaryDirectory.resolve(ProtocolBundle.ADMISSION_PATH);
+    Files.writeString(
+        manifest,
+        Files.readString(manifest, StandardCharsets.UTF_8)
+            .replace(
+                "admission/records/valid/command.json", "../records/valid/command.json"),
+        StandardCharsets.UTF_8);
+
+    IllegalStateException error =
+        assertThrows(
+            IllegalStateException.class,
+            () -> ProtocolBundle.verifyAdmissionBundle(temporaryDirectory));
+
+    assertTrue(error.getMessage().startsWith("Unsafe Admission artifact path:"));
+  }
+
+  @Test
+  void rejectsDuplicateAdmissionManifestMembers() throws IOException {
+    copyBundle(temporaryDirectory);
+    Path manifest = temporaryDirectory.resolve(ProtocolBundle.ADMISSION_PATH);
+    String profile =
+        "\"profileId\": \"missionweaveprotocol.first-admission-historical-trust.v0.1\",";
+    Files.writeString(
+        manifest,
+        Files.readString(manifest, StandardCharsets.UTF_8)
+            .replace(profile, profile + System.lineSeparator() + "  " + profile),
+        StandardCharsets.UTF_8);
+
+    assertThrows(IOException.class, () -> ProtocolBundle.verifyAdmissionBundle(temporaryDirectory));
+  }
+
+  @Test
+  void rejectsAdmissionPinCountMismatch() throws IOException {
+    copyBundle(temporaryDirectory);
+    Path pin = temporaryDirectory.resolve(ProtocolBundle.PIN_RESOURCE);
+    Files.writeString(
+        pin,
+        Files.readString(pin, StandardCharsets.UTF_8)
+            .replace("\"evaluationCount\": 30", "\"evaluationCount\": 31"),
+        StandardCharsets.UTF_8);
+
+    IllegalStateException error =
+        assertThrows(
+            IllegalStateException.class,
+            () -> ProtocolBundle.verifyAdmissionBundle(temporaryDirectory));
+
+    assertTrue(error.getMessage().startsWith("admission.evaluationCount expected"));
   }
 
   @Test
@@ -204,14 +300,14 @@ class ProtocolBundleTest {
     IllegalStateException error =
         assertThrows(IllegalStateException.class, () -> ProtocolBundle.verify(temporaryDirectory));
 
-    assertEquals("conformance expected 57 JSON files, found 56", error.getMessage());
+    assertEquals("conformance expected 59 JSON files, found 58", error.getMessage());
   }
 
   private static void assertVerification(ProtocolBundle.Verification verification) {
     assertEquals(ProtocolBundle.COMMIT, verification.protocolCommit());
     assertEquals(ProtocolBundle.PROTOCOL_VERSION, verification.protocolVersion());
-    assertEquals(21, verification.schemaFiles());
-    assertEquals(57, verification.conformanceFiles());
+    assertEquals(22, verification.schemaFiles());
+    assertEquals(59, verification.conformanceFiles());
     assertEquals(ProtocolBundle.BUNDLE_SHA256, verification.bundleSha256());
   }
 
@@ -224,6 +320,20 @@ class ProtocolBundleTest {
     assertEquals(ProtocolBundle.CRYPTOGRAPHY_ARTIFACT_COUNT, verification.artifactCount());
     assertEquals(ProtocolBundle.CRYPTOGRAPHY_CASE_COUNT, verification.caseCount());
     assertEquals(ProtocolBundle.CRYPTOGRAPHY_EVALUATION_COUNT, verification.evaluationCount());
+  }
+
+  private static void assertAdmissionVerification(
+      ProtocolBundle.AdmissionVerification verification) {
+    assertEquals(ProtocolBundle.ADMISSION_SOURCE_COMMIT, verification.sourceCommit());
+    assertEquals(ProtocolBundle.ADMISSION_PROFILE_ID, verification.profileId());
+    assertEquals(ProtocolBundle.ADMISSION_MANIFEST_VERSION, verification.manifestVersion());
+    assertEquals(
+        ProtocolBundle.ADMISSION_CRYPTOGRAPHY_ARTIFACT_DIGEST,
+        verification.cryptographyArtifactDigest());
+    assertEquals(ProtocolBundle.ADMISSION_ARTIFACT_DIGEST, verification.artifactDigest());
+    assertEquals(ProtocolBundle.ADMISSION_ARTIFACT_COUNT, verification.artifactCount());
+    assertEquals(ProtocolBundle.ADMISSION_CASE_COUNT, verification.caseCount());
+    assertEquals(ProtocolBundle.ADMISSION_EVALUATION_COUNT, verification.evaluationCount());
   }
 
   private static void copyBundle(Path destination) throws IOException {

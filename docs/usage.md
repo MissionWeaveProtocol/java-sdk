@@ -11,8 +11,9 @@ coordinates are:
 </dependency>
 ```
 
-The protocol resources are packaged in the JAR and resolved offline. No schema
-download is required at runtime.
+The protocol resources are packaged in the JAR and resolved offline. The JAR includes 22 schemas,
+58 structural conformance vectors, the unchanged 62-evaluation cryptography bundle, and the
+independent 30-evaluation Admission bundle. No schema download is required at runtime.
 
 ## Strict JSON and schema validation
 
@@ -33,7 +34,7 @@ SchemaCatalog catalog = SchemaCatalog.packaged();
 catalog.validate("command.schema.json", command);
 ```
 
-`SchemaCatalog.packaged()` compiles the 21 bundled Draft 2020-12 schemas once
+`SchemaCatalog.packaged()` compiles the 22 bundled Draft 2020-12 schemas once
 for the catalog instance. Relative `$ref` values resolve only from the bundled
 schema registry, and format assertions such as `date-time` are enabled.
 
@@ -143,6 +144,94 @@ First-Admission Record, freshness, replay, and authorization checks.
 `KeyResolver` now returns `KeyRegistrySnapshot`, not `ResolvedKey`. The `ResolvedKey` record now
 begins with `organizationId`, and there is no legacy overload or selected-key resolver adapter.
 
+## First admission and historical trust
+
+`AdmissionService` composes Admission above the unchanged six-stage verifier. `admitFirst` accepts
+an `AdmissionCurrentKeyResolver`, whose `resolveCurrent` method asserts that complete
+Organization-wide Registry evidence is current and applicable to a new admission. It completes all
+six Signed Document stages before consulting the Admission Log. An existing authenticated record is
+strictly parsed, schema-validated, rebound to the verification evidence, and returned without
+issuing trusted context or appending anything.
+
+Only authoritative absence permits `TrustedAdmissionContext.issue` followed by
+`AdmissionLog.appendOrReturnExisting`. The append return value is authenticated and validated again
+before admitted evidence is returned. `verifyHistoricalAdmission` instead accepts the existing
+historical `KeyResolver`, reruns all six stages with retained Registry history, requires an existing
+record, and never creates one.
+
+```java
+import java.nio.file.Files;
+import java.nio.file.Path;
+import org.missionweaveprotocol.sdk.AdmissionContextValue;
+import org.missionweaveprotocol.sdk.AdmissionCurrentKeyResolver;
+import org.missionweaveprotocol.sdk.AdmissionLog;
+import org.missionweaveprotocol.sdk.AdmissionLookup;
+import org.missionweaveprotocol.sdk.AdmissionService;
+import org.missionweaveprotocol.sdk.AuthenticatedAdmissionRecord;
+import org.missionweaveprotocol.sdk.KeyRegistrySnapshot;
+import org.missionweaveprotocol.sdk.KeyResolver;
+import org.missionweaveprotocol.sdk.Principal;
+import org.missionweaveprotocol.sdk.SignedDocumentKind;
+
+byte[] currentRegistryBytes = Files.readAllBytes(Path.of("current-agent-registry.json"));
+byte[] retainedRegistryBytes = Files.readAllBytes(Path.of("retained-agent-registry.json"));
+byte[] receivedBytes = Files.readAllBytes(Path.of("command.json"));
+AdmissionCurrentKeyResolver currentRegistry =
+    request -> KeyRegistrySnapshot.organizationWide(currentRegistryBytes);
+KeyResolver historicalRegistry =
+    request -> KeyRegistrySnapshot.organizationWide(retainedRegistryBytes);
+Principal admissionService =
+    new Principal("service", "urn:missionweaveprotocol:service:admission");
+
+AdmissionLog admissionLog =
+    new AdmissionLog() {
+      private AuthenticatedAdmissionRecord stored;
+
+      @Override
+      public AdmissionLookup lookup(String organizationId, String signingHash) {
+        return stored == null
+            ? new AdmissionLookup.AuthoritativeAbsence()
+            : new AdmissionLookup.Found(stored);
+      }
+
+      @Override
+      public AuthenticatedAdmissionRecord appendOrReturnExisting(
+          String organizationId, String signingHash, byte[] candidateBytes) {
+        if (stored == null) {
+          stored = new AuthenticatedAdmissionRecord(candidateBytes, admissionService);
+        }
+        return stored;
+      }
+    };
+
+var trustedContext =
+    new AdmissionContextValue(
+        "urn:missionweaveprotocol:admission-record:command",
+        "2026-07-15T00:05:00Z",
+        admissionService);
+AdmissionService admissions = new AdmissionService();
+var first =
+    admissions.admitFirst(
+        SignedDocumentKind.COMMAND,
+        receivedBytes,
+        currentRegistry,
+        admissionLog,
+        (organizationId, signingHash) -> trustedContext);
+var historical =
+    admissions.verifyHistoricalAdmission(
+        SignedDocumentKind.COMMAND, receivedBytes, historicalRegistry, admissionLog);
+```
+
+Deployment adapters report protected failures with `AdmissionAdapterException`; the public API does
+not accept authentication, integrity, or trust booleans. Admission rejections use the separate
+checked `AdmissionException`, expose only `AUTH_INVALID_SIGNATURE` through `wireCode()`, and retain
+stage `admission` plus a stable reason in `diagnostic()`. Failures in the underlying six-stage pass
+remain `SignedDocumentVerificationException` values with their original stage and wire code.
+
+`prepareFirstAdmission` is also public for an orchestrator that has already established
+authoritative absence and needs the canonical candidate bytes before an atomic append. It does not
+commit the record by itself.
+
 ## Generic WebSocket frames
 
 `FrameCodec` validates generic JSON objects against
@@ -203,7 +292,7 @@ Or point it at a protocol repository or release-bundle root:
   exec:java
 ```
 
-The expected bundled result is `56/56 conformance vectors passed`.
+The expected bundled result is `58/58 conformance vectors passed`.
 
 ## Runnable examples
 

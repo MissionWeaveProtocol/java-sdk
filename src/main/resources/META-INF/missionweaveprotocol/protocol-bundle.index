@@ -1,3 +1,22 @@
+admission/README.md
+admission/manifest.json
+admission/manifest.schema.json
+admission/records/invalid/accepted-by-non-service.json
+admission/records/invalid/document-kind-mismatch.json
+admission/records/invalid/key-id-mismatch.json
+admission/records/invalid/organization-mismatch.json
+admission/records/invalid/principal-mismatch.json
+admission/records/invalid/signing-hash-mismatch.json
+admission/records/valid/agent-card.json
+admission/records/valid/approval.json
+admission/records/valid/artifact.json
+admission/records/valid/command.json
+admission/records/valid/context-package.json
+admission/records/valid/event.json
+admission/records/valid/evidence.json
+admission/records/valid/extension-profile.json
+admission/records/valid/group-snapshot.json
+admission/registries/registry-later-revocation.json
 conformance/manifest.json
 conformance/vectors/invalid/agent-card-with-permissions.json
 conformance/vectors/invalid/agent-command-missing-membership-epoch.json
@@ -15,6 +34,7 @@ conformance/vectors/invalid/error-unknown-stale-coordinator-code.json
 conformance/vectors/invalid/event-zero-sequence.json
 conformance/vectors/invalid/evidence-without-criteria.json
 conformance/vectors/invalid/extension-overrides-core.json
+conformance/vectors/invalid/first-admission-record-with-signature.json
 conformance/vectors/invalid/group-archived-without-snapshot.json
 conformance/vectors/invalid/group-event-missing-authority-context.json
 conformance/vectors/invalid/group-snapshot-without-policy-log.json
@@ -42,6 +62,7 @@ conformance/vectors/valid/error.json
 conformance/vectors/valid/event.json
 conformance/vectors/valid/evidence.json
 conformance/vectors/valid/extension-profile.json
+conformance/vectors/valid/first-admission-record.json
 conformance/vectors/valid/group-snapshot.json
 conformance/vectors/valid/group.json
 conformance/vectors/valid/human-mission-create-command.json
@@ -66,6 +87,7 @@ schemas/error.schema.json
 schemas/event.schema.json
 schemas/evidence.schema.json
 schemas/extension-profile.schema.json
+schemas/first-admission-record.schema.json
 schemas/group-snapshot.schema.json
 schemas/group.schema.json
 schemas/lease.schema.json

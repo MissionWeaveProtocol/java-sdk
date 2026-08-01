@@ -28,7 +28,7 @@ class SchemaCatalogTest {
 
     catalog.validate("command.schema.json", valid);
 
-    assertEquals(21, catalog.schemaNames().size());
+    assertEquals(22, catalog.schemaNames().size());
     assertThrows(
         SchemaValidationException.class,
         () -> catalog.validate("schemas/command.schema.json", invalidTime));

@@ -72,12 +72,18 @@ package example;
 
 import java.nio.charset.StandardCharsets;
 import java.io.InputStream;
+import org.missionweaveprotocol.sdk.AdmissionContextValue;
+import org.missionweaveprotocol.sdk.AdmissionLog;
+import org.missionweaveprotocol.sdk.AdmissionLookup;
+import org.missionweaveprotocol.sdk.AdmissionService;
+import org.missionweaveprotocol.sdk.AuthenticatedAdmissionRecord;
 import org.missionweaveprotocol.sdk.ConformanceReport;
 import org.missionweaveprotocol.sdk.ConformanceRunner;
 import org.missionweaveprotocol.sdk.FrameCodec;
 import org.missionweaveprotocol.sdk.KeyRegistryCompleteness;
 import org.missionweaveprotocol.sdk.KeyRegistrySnapshot;
 import org.missionweaveprotocol.sdk.ProtocolBundle;
+import org.missionweaveprotocol.sdk.Principal;
 import org.missionweaveprotocol.sdk.SignedDocumentCodec;
 import org.missionweaveprotocol.sdk.SignedDocumentKind;
 
@@ -86,13 +92,13 @@ public final class Consumer {
 
   public static void main(String[] arguments) throws Exception {
     var bundle = ProtocolBundle.verifyPackaged();
-    if (!bundle.protocolCommit().equals("27c9f5c80cdcc1bd2179aae6247426f59e833525")
-        || bundle.schemaFiles() != 21
-        || bundle.conformanceFiles() != 57) {
+    if (!bundle.protocolCommit().equals("f7e70a72c76bbeb5014c186cd820aac2112f0dde")
+        || bundle.schemaFiles() != 22
+        || bundle.conformanceFiles() != 59) {
       throw new IllegalStateException("Installed protocol bundle is incomplete");
     }
     var cryptography = ProtocolBundle.verifyPackagedCryptographyBundle();
-    if (!cryptography.sourceCommit().equals("27c9f5c80cdcc1bd2179aae6247426f59e833525")
+    if (!cryptography.sourceCommit().equals("f7e70a72c76bbeb5014c186cd820aac2112f0dde")
         || !cryptography
             .artifactDigest()
             .equals("sha256:5eade516e4bc5dcf04477727ebcccd11f33348b2d9135fb6fe0365c6e6cc2ea3")
@@ -101,9 +107,19 @@ public final class Consumer {
         || cryptography.evaluationCount() != 62) {
       throw new IllegalStateException("Installed cryptography bundle is incomplete");
     }
+    var admission = ProtocolBundle.verifyPackagedAdmissionBundle();
+    if (!admission.sourceCommit().equals("f7e70a72c76bbeb5014c186cd820aac2112f0dde")
+        || !admission
+            .artifactDigest()
+            .equals("sha256:39971bfafb68ef6c18f9026220cccc4f023fd4d5c8074f8ff0276cb1129cd0a0")
+        || admission.artifactCount() != 19
+        || admission.caseCount() != 5
+        || admission.evaluationCount() != 30) {
+      throw new IllegalStateException("Installed Admission bundle is incomplete");
+    }
 
     ConformanceReport report = ConformanceRunner.runPackaged();
-    if (!report.passed() || report.results().size() != 56) {
+    if (!report.passed() || report.results().size() != 58) {
       throw new IllegalStateException(report.summary());
     }
 
@@ -146,8 +162,47 @@ public final class Consumer {
         .equals("urn:missionweaveprotocol:organization:acme")) {
       throw new IllegalStateException("Installed SDK lost the resolved Organization evidence");
     }
+
+    byte[] committed =
+        resource(
+            "admission/records/valid/command.json",
+            "Installed JAR is missing the valid Command Admission record");
+    AdmissionLog admissionLog =
+        new AdmissionLog() {
+          @Override
+          public AdmissionLookup lookup(String organizationId, String signingHash) {
+            return new AdmissionLookup.AuthoritativeAbsence();
+          }
+
+          @Override
+          public AuthenticatedAdmissionRecord appendOrReturnExisting(
+              String organizationId, String signingHash, byte[] candidateBytes) {
+            return new AuthenticatedAdmissionRecord(
+                committed,
+                new Principal("service", "urn:missionweaveprotocol:service:admission"));
+          }
+        };
+    var admitted =
+        new AdmissionService()
+            .admitFirst(
+                SignedDocumentKind.COMMAND,
+                command,
+                request -> snapshot,
+                admissionLog,
+                (organizationId, signingHash) ->
+                    new AdmissionContextValue(
+                        "urn:missionweaveprotocol:admission-record:crypto-vector-command",
+                        "2026-07-15T00:05:00Z",
+                        new Principal(
+                            "service", "urn:missionweaveprotocol:service:admission")));
+    if (!admitted.record().signingHash().equals(admitted.verified().signingHash())) {
+      throw new IllegalStateException("Installed SDK lost Admission binding evidence");
+    }
     System.out.println(
-        "Installed SDK smoke passed: " + report.summary() + "; " + verified.signingHash());
+        "Installed SDK smoke passed: "
+            + report.summary()
+            + "; "
+            + admitted.record().signingHash());
   }
 
   private static byte[] resource(String path, String missingMessage) throws Exception {

@@ -29,10 +29,11 @@ The official Java 21 SDK for validating, canonicalizing, signing, and testing
 | SDK coordinates | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Protocol version | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Protocol commit | [`27c9f5c80cdcc1bd2179aae6247426f59e833525`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/27c9f5c80cdcc1bd2179aae6247426f59e833525) |
-| JSON Schemas | 21 |
-| Conformance vectors | 56: 26 valid and 30 invalid |
+| Protocol commit | [`f7e70a72c76bbeb5014c186cd820aac2112f0dde`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/f7e70a72c76bbeb5014c186cd820aac2112f0dde) |
+| JSON Schemas | 22 |
+| Conformance vectors | 58: 27 valid and 31 invalid |
 | Cryptography evaluations | [62](cryptography/README.md) |
+| Admission evaluations | [30: 12 complete and 18 rejected](admission/README.md) |
 
 The JAR contains the complete offline bundle. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 records its source, file counts, and SHA-256 tree digests.
@@ -41,7 +42,7 @@ records its source, file counts, and SHA-256 tree digests.
 
 - `StrictJson` rejects duplicate object members, invalid UTF-8, and trailing
   data at the trust boundary.
-- `SchemaCatalog` compiles the 21 Draft 2020-12 schemas into a fully offline
+- `SchemaCatalog` compiles the 22 Draft 2020-12 schemas into a fully offline
   registry with format assertions enabled.
 - `FrameCodec` strictly decodes, validates, and canonically encodes generic
   MissionWeaveProtocol WebSocket frames; it does not create a connection.
@@ -61,7 +62,12 @@ records its source, file counts, and SHA-256 tree digests.
   no-alias invariants, and complete validity history before selecting the key. `PARTIAL`,
   `UNSPECIFIED`, `null`, empty, unavailable, or malformed evidence fails closed at key resolution;
   codec-produced evidence retains `organizationId`.
-- `ConformanceRunner` and `ConformanceCli` run all 56 packaged vectors.
+- `AdmissionService.admitFirst` uses an `AdmissionCurrentKeyResolver` for complete current Registry
+  evidence, while `verifyHistoricalAdmission` uses the existing historical `KeyResolver`. Both rerun
+  all six stages before authenticated Admission Log decisions; the API uses typed adapters and no
+  caller-provided trust, authentication, or integrity booleans.
+- `ConformanceRunner` and `ConformanceCli` run all 58 packaged vectors; the Admission suite executes
+  all 30 evaluations with 12 complete and 18 rejected.
 
 ## Quick start
 
@@ -96,6 +102,11 @@ For durable signed objects, call `SignedDocumentCodec.sign(kind, unsigned, signi
 verification evidence including the received bytes, the signing bytes and their hash, and the
 complete canonical bytes and their hash.
 
+For durable first-admission evidence, call `AdmissionService.admitFirst` with current Registry
+evidence, an authenticated append-only `AdmissionLog`, and a `TrustedAdmissionContext`.
+`verifyHistoricalAdmission` instead consumes retained historical Registry evidence, requires an
+existing validated record, and never appends a missing record.
+
 ## Runnable examples
 
 The build compiles and tests all three repository examples:
@@ -129,7 +140,7 @@ Run the packaged vectors or a separate protocol bundle:
   exec:java
 ```
 
-The packaged result is `56/56 conformance vectors passed`.
+The packaged result is `58/58 conformance vectors passed`.
 
 ## Documentation
 
@@ -142,9 +153,13 @@ The packaged result is `56/56 conformance vectors passed`.
   authority, authenticate an Agent, or prove that an action is allowed.
 - Signature helpers do not provide key trust, storage, discovery, revocation,
   timestamp policy, replay prevention, or session and membership fencing.
+- Admission depends on deployment-authenticated service identity, authorized writes, and
+  append-only integrity supplied by the adapters; successful SDK validation does not establish
+  those deployment properties by itself.
 - `FrameCodec` is a serializer, not a transport, coordinator, worker scheduler,
   durable store, retry engine, or state-machine implementation.
-- A `56/56` result demonstrates schema-and-vector conformance only; it does not
+- A `58/58` result plus 62 cryptography and 30 Admission evaluations demonstrates bounded
+  conformance only; it does not
   establish interoperability, complete behavior, security, or production
   readiness.
 

@@ -32,7 +32,7 @@ class ExamplesTest {
   @Test
   void conformanceExampleRuns() throws Exception {
     assertEquals(
-        "56/56 conformance vectors passed" + System.lineSeparator(),
+        "58/58 conformance vectors passed" + System.lineSeparator(),
         capture(RunConformanceExample::run));
   }
 
