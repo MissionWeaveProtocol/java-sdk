@@ -20,4 +20,19 @@ public record ResolvedKey(
     Objects.requireNonNull(publicKey, "publicKey");
     Objects.requireNonNull(validFrom, "validFrom");
   }
+
+  /** Parsed exact lower validity bound retained from the selected Registry evidence. */
+  public ExactInstant validFromInstant() {
+    return ExactInstant.parse(validFrom);
+  }
+
+  /** Parsed exact exclusive expiry bound, or {@code null} when absent. */
+  public ExactInstant validUntilInstant() {
+    return validUntil == null ? null : ExactInstant.parse(validUntil);
+  }
+
+  /** Parsed exact exclusive revocation bound, or {@code null} when absent. */
+  public ExactInstant revokedAtInstant() {
+    return revokedAt == null ? null : ExactInstant.parse(revokedAt);
+  }
 }

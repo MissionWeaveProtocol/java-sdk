@@ -28,10 +28,11 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | 協定版本 | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| 協定 commit | [`27c9f5c80cdcc1bd2179aae6247426f59e833525`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/27c9f5c80cdcc1bd2179aae6247426f59e833525) |
-| JSON Schema | 21 個 |
-| 符合性向量 | 56 個：26 個有效，30 個無效 |
+| 協定 commit | [`f7e70a72c76bbeb5014c186cd820aac2112f0dde`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/f7e70a72c76bbeb5014c186cd820aac2112f0dde) |
+| JSON Schema | 22 個 |
+| 符合性向量 | 58 個：27 個有效，31 個無效 |
 | 密碼學評估 | [62](cryptography/README.md) |
+| Admission 評估 | [30 個：12 個完成，18 個拒絕](admission/README.md) |
 
 JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 記錄其來源、檔案數量與 SHA-256 樹狀摘要。
@@ -39,7 +40,7 @@ JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 ## 能力
 
 - `StrictJson` 在信任邊界拒絕重複物件成員、無效 UTF-8 與尾隨資料。
-- `SchemaCatalog` 將 21 個 Draft 2020-12 Schema 編譯為完全離線的登錄庫，並啟用格式斷言。
+- `SchemaCatalog` 將 22 個 Draft 2020-12 Schema 編譯為完全離線的登錄庫，並啟用格式斷言。
 - `FrameCodec` 嚴格解碼、驗證並正規編碼通用 MissionWeaveProtocol WebSocket 訊框；它不建立連線。
 - `CanonicalJson` 提供 RFC 8785 JCS 與 SHA-256 識別碼。
 - `Ed25519`、`Base64Url` 與 `DocumentSignatures` 提供 JDK Ed25519 簽署、無填補 base64url，以及頂層 `signature` 省略。
@@ -55,7 +56,12 @@ JAR 包含完整的離線成品包。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
   完整性為 `PARTIAL` 或 `UNSPECIFIED`，或 Registry 證據為空、無法取得或格式錯誤時，
   均會在金鑰解析階段安全拒絕（fail closed）。編解碼器產生的 `ResolvedKey` 會保留
   Registry 的 `organizationId`。
-- `ConformanceRunner` 與 `ConformanceCli` 執行全部 56 個內建向量。
+- `AdmissionService.admitFirst` 透過 `AdmissionCurrentKeyResolver` 取得適用於首次准入的完整、
+  當前 Registry 證據；`verifyHistoricalAdmission` 則沿用歷史 `KeyResolver`。兩條路徑都先
+  重跑六階段驗證，再執行已驗證身分的 Admission Log 決策；API 僅使用具型別的轉接器，
+  不接受呼叫端提供的信任、驗證身分或完整性布林值。
+- `ConformanceRunner` 與 `ConformanceCli` 執行全部 58 個內建向量；Admission 測試套件執行
+  30 個評估，其中 12 個完成、18 個拒絕。
 
 ## 快速開始
 
@@ -88,6 +94,10 @@ public final class QuickStart {
 對持久化簽章物件，請呼叫 `SignedDocumentCodec.sign(kind, unsigned, signingKey)` 與
 `verify(kind, receivedBytes, keyResolver)`；編解碼器不會推斷文件種類，並回傳不可變的
 驗章證據，包括接收的原始位元組、簽署輸入位元組及其雜湊，以及完整文件的正規位元組及其雜湊。
+
+對持久化首次准入證據，請呼叫 `AdmissionService.admitFirst`，並傳入當前 Registry 證據、
+已驗證身分且僅附加的 `AdmissionLog` 與 `TrustedAdmissionContext`。
+`verifyHistoricalAdmission` 改用留存的歷史 Registry 證據，要求已有有效記錄，且絕不附加缺失記錄。
 
 ## 可執行範例
 
@@ -122,7 +132,7 @@ public final class QuickStart {
   exec:java
 ```
 
-內建結果為 `56/56 conformance vectors passed`。
+內建結果為 `58/58 conformance vectors passed`。
 
 ## 文件
 
@@ -133,8 +143,11 @@ public final class QuickStart {
 
 - Schema 驗證檢查文件結構與格式；它不會授予權限、驗證 Agent 身分，或證明某個動作獲准。
 - 簽章輔助工具不提供金鑰信任、儲存、探索、撤銷、時間戳記政策、重播防護，也不提供透過 Session Epoch 與 Membership Epoch 使舊 Session 權限或舊 Membership 權限失效的 fencing。
+- Admission 依賴部署轉接器保證服務身分驗證、寫入授權與僅附加完整性；SDK 驗證成功本身無法
+  證明這些部署屬性。
 - `FrameCodec` 是序列化器，不是傳輸層、Coordinator、Worker Scheduler、持久化儲存、重試引擎或狀態機實作。
-- `56/56` 結果僅證明 Schema 與測試向量符合性；它不代表互通性、完整行為、安全性或生產就緒性。
+- `58/58` 結果加上 62 個密碼學評估與 30 個 Admission 評估，只證明有限範圍內的符合性；
+  它不代表互通性、完整行為、安全性或生產就緒性。
 
 ## 開發
 

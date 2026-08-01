@@ -87,6 +87,7 @@
           <include>schemas/**/*.json</include>
           <include>conformance/**/*.json</include>
           <include>cryptography/**/*</include>
+          <include>admission/**/*</include>
         </includes>
       </resource>
       <resource>

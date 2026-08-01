@@ -39,24 +39,31 @@ class ProtocolBundlePackagingIT {
       assertEquals(ProtocolBundle.CRYPTOGRAPHY_ARTIFACT_COUNT, cryptography.artifactCount());
       assertEquals(ProtocolBundle.CRYPTOGRAPHY_CASE_COUNT, cryptography.caseCount());
       assertEquals(ProtocolBundle.CRYPTOGRAPHY_EVALUATION_COUNT, cryptography.evaluationCount());
+      ProtocolBundle.AdmissionVerification admission =
+          ProtocolBundle.verifyPackagedAdmissionBundle(loader);
+      assertEquals(ProtocolBundle.ADMISSION_ARTIFACT_DIGEST, admission.artifactDigest());
+      assertEquals(ProtocolBundle.ADMISSION_ARTIFACT_COUNT, admission.artifactCount());
+      assertEquals(ProtocolBundle.ADMISSION_CASE_COUNT, admission.caseCount());
+      assertEquals(ProtocolBundle.ADMISSION_EVALUATION_COUNT, admission.evaluationCount());
 
       assertNotNull(jar.getJarEntry(ProtocolBundle.PIN_RESOURCE));
       assertNotNull(jar.getJarEntry(ProtocolBundle.INDEX_RESOURCE));
 
-      List<String> protocolEntries =
+      List<String> indexedEntries =
           jar.stream()
               .filter(entry -> !entry.isDirectory())
               .map(JarEntry::getName)
               .filter(
                   name ->
-                      (name.startsWith("schemas/") || name.startsWith("conformance/"))
-                          && name.endsWith(".json"))
+                      ((name.startsWith("schemas/") || name.startsWith("conformance/"))
+                              && name.endsWith(".json"))
+                          || name.startsWith("admission/"))
               .sorted()
               .toList();
-      assertEquals(78, protocolEntries.size());
-      assertEquals(Set.copyOf(ProtocolBundle.resourcePaths(loader)), Set.copyOf(protocolEntries));
+      assertEquals(100, indexedEntries.size());
+      assertEquals(Set.copyOf(ProtocolBundle.resourcePaths(loader)), Set.copyOf(indexedEntries));
 
-      for (String path : protocolEntries) {
+      for (String path : indexedEntries) {
         try (InputStream packaged = jar.getInputStream(jar.getJarEntry(path))) {
           assertArrayEquals(Files.readAllBytes(ROOT.resolve(path)), packaged.readAllBytes(), path);
         }

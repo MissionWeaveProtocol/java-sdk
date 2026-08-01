@@ -27,10 +27,11 @@
 | SDK 座標 | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | プロトコルバージョン | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| プロトコル commit | [`27c9f5c80cdcc1bd2179aae6247426f59e833525`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/27c9f5c80cdcc1bd2179aae6247426f59e833525) |
-| JSON Schema | 21 |
-| 適合性ベクトル | 56：有効 26、無効 30 |
+| プロトコル commit | [`f7e70a72c76bbeb5014c186cd820aac2112f0dde`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/f7e70a72c76bbeb5014c186cd820aac2112f0dde) |
+| JSON Schema | 22 |
+| 適合性ベクトル | 58：有効 27、無効 31 |
 | 暗号評価 | [62](cryptography/README.md) |
+| Admission 評価 | [30：complete 12、rejected 18](admission/README.md) |
 
 JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 に取得元、ファイル数、SHA-256 ツリーダイジェストを記録しています。
@@ -38,7 +39,7 @@ JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN
 ## 機能
 
 - `StrictJson` は信頼境界で、重複したオブジェクトメンバー、不正な UTF-8、末尾データを拒否します。
-- `SchemaCatalog` は 21 個の Draft 2020-12 Schema を、format assertion を有効にした完全オフラインのレジストリへコンパイルします。
+- `SchemaCatalog` は 22 個の Draft 2020-12 Schema を、format assertion を有効にした完全オフラインのレジストリへコンパイルします。
 - `FrameCodec` は汎用 MissionWeaveProtocol WebSocket フレームを厳密にデコード、検証、正規エンコードします。接続自体は作成しません。
 - `CanonicalJson` は RFC 8785 JCS と SHA-256 識別子を提供します。
 - `Ed25519`、`Base64Url`、`DocumentSignatures` は JDK Ed25519 署名、パディングなし base64url、トップレベル `signature` の除外を提供します。
@@ -58,7 +59,12 @@ JAR には完全なオフラインバンドルが含まれます。[PROTOCOL_PIN
   Registry エビデンスが空、取得できない、または形式不正の場合は、鍵解決段階で安全側に
   拒否されます（fail closed）。コーデックが生成する `ResolvedKey` には Registry の
   `organizationId` も保持されます。
-- `ConformanceRunner` と `ConformanceCli` は同梱された 56 ベクトルをすべて実行します。
+- `AdmissionService.admitFirst` は、新規 Admission に適用可能な完全かつ現在の Registry
+  エビデンスを `AdmissionCurrentKeyResolver` から取得します。`verifyHistoricalAdmission`
+  は既存の履歴用 `KeyResolver` を使用します。どちらも認証済み Admission Log の判断より先に
+  6 段階検証を再実行し、呼び出し側が指定する trust・authentication・integrity の真偽値を受け取りません。
+- `ConformanceRunner` と `ConformanceCli` は同梱された 58 ベクトルをすべて実行します。
+  Admission スイートは 30 評価（complete 12、rejected 18）を実行します。
 
 ## クイックスタート
 
@@ -93,6 +99,11 @@ public final class QuickStart {
 エビデンスとして、受信バイト列、署名対象バイト列とそのハッシュ、および完全な正規化
 バイト列とそのハッシュが返されます。
 
+永続的な First-Admission エビデンスには、現在の Registry エビデンス、認証済みで追記専用の
+`AdmissionLog`、`TrustedAdmissionContext` とともに `AdmissionService.admitFirst` を使用します。
+`verifyHistoricalAdmission` は保持された履歴 Registry エビデンスを使い、既存の検証済み記録を
+必須とし、欠落した記録を追記しません。
+
 ## 実行可能なサンプル
 
 ビルドはリポジトリ内の 3 つのサンプルをコンパイルし、テストします。
@@ -126,7 +137,7 @@ public final class QuickStart {
   exec:java
 ```
 
-同梱結果は `56/56 conformance vectors passed` です。
+同梱結果は `58/58 conformance vectors passed` です。
 
 ## ドキュメント
 
@@ -137,8 +148,11 @@ public final class QuickStart {
 
 - Schema 検証は文書構造と形式を確認します。権限の付与、Agent の認証、アクションの許可証明は行いません。
 - 署名ヘルパーは、鍵の信頼、保管、探索、失効、タイムスタンプポリシー、リプレイ防止、Session Epoch と Membership Epoch のフェンシングを提供しません。
+- Admission は、デプロイメントアダプターが保証するサービス ID の認証、書き込み権限、
+  追記専用の完全性に依存します。SDK の検証成功だけでは、それらのデプロイメント特性を証明しません。
 - `FrameCodec` はシリアライザーであり、トランスポート、Coordinator、Worker Scheduler、永続ストア、再試行エンジン、状態機械の実装ではありません。
-- `56/56` は Schema とテストベクトルへの適合のみを示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
+- `58/58` に 62 の暗号評価と 30 の Admission 評価を加えた結果も、限定された適合性のみを
+  示します。相互運用性、完全な動作、セキュリティ、本番準備完了を保証しません。
 
 ## 開発
 

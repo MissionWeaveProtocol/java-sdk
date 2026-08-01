@@ -47,7 +47,7 @@ class ConformanceCliTest {
 
     assertEquals(0, exitCode, () -> error.toString(StandardCharsets.UTF_8));
     assertEquals(
-        "56/56 conformance vectors passed" + System.lineSeparator(),
+        "58/58 conformance vectors passed" + System.lineSeparator(),
         output.toString(StandardCharsets.UTF_8));
     assertEquals("", error.toString(StandardCharsets.UTF_8));
   }

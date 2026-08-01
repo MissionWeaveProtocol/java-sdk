@@ -11,19 +11,19 @@ class ConformanceRunnerTest {
   private static final Path ROOT = Path.of("").toAbsolutePath().normalize();
 
   @Test
-  void packagedManifestPassesAllFiftySixVectors() throws IOException {
+  void packagedManifestPassesAllFiftyEightVectors() throws IOException {
     ConformanceReport report = ConformanceRunner.runPackaged();
 
-    assertEquals(56, report.results().size());
+    assertEquals(58, report.results().size());
     assertTrue(report.passed(), () -> failures(report));
-    assertEquals("56/56 conformance vectors passed", report.summary());
+    assertEquals("58/58 conformance vectors passed", report.summary());
   }
 
   @Test
-  void sourceManifestPassesAllFiftySixVectors() throws IOException {
+  void sourceManifestPassesAllFiftyEightVectors() throws IOException {
     ConformanceReport report = ConformanceRunner.run(ROOT);
 
-    assertEquals(56, report.results().size());
+    assertEquals(58, report.results().size());
     assertTrue(report.passed(), () -> failures(report));
   }
 

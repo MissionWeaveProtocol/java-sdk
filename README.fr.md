@@ -28,10 +28,11 @@ SDK Java 21 officiel pour valider, canonicaliser, signer et tester les données
 | Coordonnées du SDK | `org.missionweaveprotocol:missionweaveprotocol-sdk:0.1.0-SNAPSHOT` |
 | Version du protocole | `0.1` |
 | Wire namespace | `missionweaveprotocol` |
-| Commit du protocole | [`27c9f5c80cdcc1bd2179aae6247426f59e833525`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/27c9f5c80cdcc1bd2179aae6247426f59e833525) |
-| Schémas JSON | 21 |
-| Vecteurs de conformité | 56 : 26 valides et 30 invalides |
+| Commit du protocole | [`f7e70a72c76bbeb5014c186cd820aac2112f0dde`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/f7e70a72c76bbeb5014c186cd820aac2112f0dde) |
+| Schémas JSON | 22 |
+| Vecteurs de conformité | 58 : 27 valides et 31 invalides |
 | Évaluations cryptographiques | [62](cryptography/README.md) |
+| Évaluations Admission | [30 : 12 terminées et 18 rejetées](admission/README.md) |
 
 Le JAR contient le paquet hors ligne complet. [PROTOCOL_PIN.json](PROTOCOL_PIN.json)
 enregistre sa provenance, le nombre de fichiers et les empreintes SHA-256 de l’arbre.
@@ -39,7 +40,7 @@ enregistre sa provenance, le nombre de fichiers et les empreintes SHA-256 de l�
 ## Capacités
 
 - `StrictJson` rejette les membres d’objet en double, l’UTF-8 invalide et les données superflues en fin d’entrée au niveau de la frontière de confiance.
-- `SchemaCatalog` compile les 21 schémas Draft 2020-12 dans un registre entièrement hors ligne avec les assertions de format activées.
+- `SchemaCatalog` compile les 22 schémas Draft 2020-12 dans un registre entièrement hors ligne avec les assertions de format activées.
 - `FrameCodec` décode, valide et encode canoniquement des trames WebSocket MissionWeaveProtocol génériques ; il ne crée pas de connexion.
 - `CanonicalJson` fournit JCS RFC 8785 et des identifiants SHA-256.
 - `Ed25519`, `Base64Url` et `DocumentSignatures` fournissent les signatures Ed25519 du JDK, base64url sans remplissage et l’omission du `signature` de premier niveau.
@@ -58,7 +59,13 @@ enregistre sa provenance, le nombre de fichiers et les empreintes SHA-256 de l�
   complet avant de sélectionner la clé. Si la preuve est `PARTIAL`, `UNSPECIFIED`, `null` ou vide,
   si elle est indisponible ou si elle est mal formée, la résolution de clé échoue en mode fermé ;
   les preuves produites par le codec conservent `organizationId`.
-- `ConformanceRunner` et `ConformanceCli` exécutent les 56 vecteurs inclus.
+- `AdmissionService.admitFirst` obtient via `AdmissionCurrentKeyResolver` une preuve Registry complète
+  et actuelle applicable à une nouvelle admission ; `verifyHistoricalAdmission` utilise le
+  `KeyResolver` historique existant. Les deux chemins réexécutent les six étapes avant toute décision
+  du journal Admission authentifié, sans booléens de confiance, d’authentification ou d’intégrité
+  fournis par l’appelant.
+- `ConformanceRunner` et `ConformanceCli` exécutent les 58 vecteurs inclus ; la suite Admission
+  exécute 30 évaluations, dont 12 terminées et 18 rejetées.
 
 ## Démarrage rapide
 
@@ -93,6 +100,11 @@ Pour les objets signés durables, utilisez `SignedDocumentCodec.sign(kind, unsig
 preuves de vérification immuables comprenant les octets reçus, les octets utilisés pour la
 signature et leur hachage, ainsi que les octets canoniques du document complet et leur hachage.
 
+Pour une preuve durable de première admission, utilisez `AdmissionService.admitFirst` avec la preuve
+Registry actuelle, un `AdmissionLog` authentifié et en ajout seulement, ainsi qu’un
+`TrustedAdmissionContext`. `verifyHistoricalAdmission` utilise la preuve Registry historique
+conservée, exige un enregistrement validé existant et n’ajoute jamais un enregistrement absent.
+
 ## Exemples exécutables
 
 Le processus de compilation construit et teste les trois exemples du dépôt :
@@ -126,7 +138,7 @@ Exécutez les vecteurs inclus ou un paquet de protocole distinct :
   exec:java
 ```
 
-Le résultat inclus est `56/56 conformance vectors passed`.
+Le résultat inclus est `58/58 conformance vectors passed`.
 
 ## Documentation
 
@@ -137,8 +149,13 @@ Le résultat inclus est `56/56 conformance vectors passed`.
 
 - La validation des schémas vérifie la forme et les formats du document. Elle n’accorde aucune autorité, n’authentifie pas un Agent et ne prouve pas qu’une action est autorisée.
 - Les outils de signature ne gèrent ni la confiance accordée aux clés, ni leur stockage, leur découverte ou leur révocation ; ils n’offrent pas non plus de politique d’horodatage, de prévention des rejeux ou de fencing par Session Epoch et Membership Epoch invalidant les autorités obsolètes.
+- Admission dépend des adaptateurs de déploiement pour garantir l’identité de service authentifiée,
+  les écritures autorisées et l’intégrité en ajout seulement ; une validation réussie du SDK ne
+  prouve pas à elle seule ces propriétés de déploiement.
 - `FrameCodec` est un sérialiseur, pas un transport, un coordinateur, un ordonnanceur de Workers, un stockage durable, un moteur de nouvelle tentative ou une implémentation de machine à états.
-- Un résultat `56/56` démontre uniquement une conformité limitée aux schémas et aux vecteurs ; il n’établit ni interopérabilité, ni comportement complet, ni sécurité, ni aptitude à la production.
+- Un résultat `58/58`, avec 62 évaluations cryptographiques et 30 évaluations Admission, démontre
+  uniquement une conformité limitée ; il n’établit ni interopérabilité, ni comportement complet,
+  ni sécurité, ni aptitude à la production.
 
 ## Développement
 

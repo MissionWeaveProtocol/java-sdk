@@ -26,7 +26,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Access to the exact MissionWeaveProtocol protocol and cryptography bundles shipped by the SDK.
+ * Access to the exact MissionWeaveProtocol protocol, cryptography, and Admission bundles shipped by
+ * the SDK.
  */
 public final class ProtocolBundle {
   /** Source repository recorded by the protocol pin. */
@@ -34,7 +35,7 @@ public final class ProtocolBundle {
       "https://github.com/missionweaveprotocol/missionweaveprotocol";
 
   /** Exact source commit recorded by the protocol pin. */
-  public static final String COMMIT = "27c9f5c80cdcc1bd2179aae6247426f59e833525";
+  public static final String COMMIT = "f7e70a72c76bbeb5014c186cd820aac2112f0dde";
 
   /** Protocol version recorded by the protocol pin. */
   public static final String PROTOCOL_VERSION = "0.1";
@@ -44,22 +45,22 @@ public final class ProtocolBundle {
 
   /** SHA-256 digest of the pinned schema tree. */
   public static final String SCHEMAS_SHA256 =
-      "de90adb6a84995ce6e7e35f20c58f74293546ad2aca61796429c8b1d8d269c42";
+      "941a5a19b8664207f1ff48b799219c2f981ecd491a5cca527d586028d976ec76";
 
   /** SHA-256 digest of the pinned conformance tree. */
   public static final String CONFORMANCE_SHA256 =
-      "fc7d6b2005b4cdebcb9d47efd0a3ce991fea111776c4271beaf8945e11b5d7df";
+      "2362acd8345e5860e605ed06984f1673a1ea0a00e76c1fe00fed222326782f24";
 
   /** SHA-256 digest of the complete pinned protocol bundle. */
   public static final String BUNDLE_SHA256 =
-      "eed30aeb0a6d39575b6ab2f3121de27cef34d27dd9659ee4e5a7204ec5deeea7";
+      "c95fc8f8334947dacf51a2c6e84d9b13f5b39b7d3827591569a1e2c5acfe47d7";
 
   /** Pinned signed-document cryptography manifest path. */
   public static final String CRYPTOGRAPHY_PATH = "cryptography/manifest.json";
 
   /** Source commit of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_SOURCE_COMMIT =
-      "27c9f5c80cdcc1bd2179aae6247426f59e833525";
+      "f7e70a72c76bbeb5014c186cd820aac2112f0dde";
 
   /** Profile ID of the pinned signed-document cryptography bundle. */
   public static final String CRYPTOGRAPHY_PROFILE_ID =
@@ -81,6 +82,36 @@ public final class ProtocolBundle {
   /** Number of evaluations in the cryptography manifest. */
   public static final int CRYPTOGRAPHY_EVALUATION_COUNT = 62;
 
+  /** Pinned First-Admission and historical-trust manifest path. */
+  public static final String ADMISSION_PATH = "admission/manifest.json";
+
+  /** Source commit of the pinned Admission bundle. */
+  public static final String ADMISSION_SOURCE_COMMIT = "f7e70a72c76bbeb5014c186cd820aac2112f0dde";
+
+  /** Profile ID of the pinned Admission bundle. */
+  public static final String ADMISSION_PROFILE_ID =
+      "missionweaveprotocol.first-admission-historical-trust.v0.1";
+
+  /** Manifest version of the pinned Admission bundle. */
+  public static final int ADMISSION_MANIFEST_VERSION = 1;
+
+  /** Cryptography digest required by the pinned Admission bundle. */
+  public static final String ADMISSION_CRYPTOGRAPHY_ARTIFACT_DIGEST =
+      "sha256:5eade516e4bc5dcf04477727ebcccd11f33348b2d9135fb6fe0365c6e6cc2ea3";
+
+  /** Artifact digest of the pinned Admission bundle. */
+  public static final String ADMISSION_ARTIFACT_DIGEST =
+      "sha256:39971bfafb68ef6c18f9026220cccc4f023fd4d5c8074f8ff0276cb1129cd0a0";
+
+  /** Number of digest-protected artifacts in the Admission manifest. */
+  public static final int ADMISSION_ARTIFACT_COUNT = 19;
+
+  /** Number of cases in the Admission manifest. */
+  public static final int ADMISSION_CASE_COUNT = 5;
+
+  /** Number of evaluations in the Admission manifest. */
+  public static final int ADMISSION_EVALUATION_COUNT = 30;
+
   static final String PIN_RESOURCE = "PROTOCOL_PIN.json";
   static final String INDEX_RESOURCE = "META-INF/missionweaveprotocol/protocol-bundle.index";
 
@@ -98,6 +129,23 @@ public final class ProtocolBundle {
           "artifacts",
           "cases");
   private static final Set<String> CRYPTOGRAPHY_ARTIFACT_FIELDS =
+      Set.of("path", "byteLength", "sha256");
+  private static final Set<String> ADMISSION_MANIFEST_FIELDS =
+      Set.of(
+          "$schema",
+          "manifestVersion",
+          "protocolVersion",
+          "profileId",
+          "semanticStage",
+          "wireCode",
+          "cryptography",
+          "fixtureSchemas",
+          "artifactDigest",
+          "artifacts",
+          "cases");
+  private static final Set<String> ADMISSION_CRYPTOGRAPHY_FIELDS =
+      Set.of("manifest", "artifactDigest");
+  private static final Set<String> ADMISSION_ARTIFACT_FIELDS =
       Set.of("path", "byteLength", "sha256");
 
   private ProtocolBundle() {}
@@ -151,6 +199,9 @@ public final class ProtocolBundle {
     validateProtocolPin(pin);
     Map<String, byte[]> resources = new LinkedHashMap<>();
     for (String path : resourcePaths(classLoader)) {
+      if (!isProtocolResourcePath(path)) {
+        continue;
+      }
       try (InputStream input = openRequired(classLoader, path)) {
         putUnique(resources, path, input.readAllBytes());
       }
@@ -199,6 +250,49 @@ public final class ProtocolBundle {
         });
   }
 
+  /** Verify the First-Admission bundle in a source checkout. */
+  public static AdmissionVerification verifyAdmissionBundle(Path root) throws IOException {
+    Path normalizedRoot = Objects.requireNonNull(root, "root").toAbsolutePath().normalize();
+    Pin pin;
+    try (InputStream input = Files.newInputStream(normalizedRoot.resolve(PIN_RESOURCE))) {
+      pin = readPin(input);
+    }
+    validateCryptographyPin(pin);
+    validateAdmissionPin(pin);
+    byte[] manifest = readSourceAdmissionManifest(normalizedRoot, pin.admission().path());
+    return verifyAdmissionResources(
+        pin.admission(), manifest, path -> readSourceAdmissionResource(normalizedRoot, path));
+  }
+
+  /** Verify the First-Admission bundle packaged with this SDK. */
+  public static AdmissionVerification verifyPackagedAdmissionBundle() throws IOException {
+    return verifyPackagedAdmissionBundle(ProtocolBundle.class.getClassLoader());
+  }
+
+  /** Verify packaged Admission resources visible to {@code classLoader}. */
+  public static AdmissionVerification verifyPackagedAdmissionBundle(ClassLoader classLoader)
+      throws IOException {
+    Objects.requireNonNull(classLoader, "classLoader");
+    Pin pin;
+    try (InputStream input = openRequired(classLoader, PIN_RESOURCE)) {
+      pin = readPin(input);
+    }
+    validateCryptographyPin(pin);
+    validateAdmissionPin(pin);
+    byte[] manifest;
+    try (InputStream input = openRequired(classLoader, pin.admission().path())) {
+      manifest = input.readAllBytes();
+    }
+    return verifyAdmissionResources(
+        pin.admission(),
+        manifest,
+        path -> {
+          try (InputStream input = openRequired(classLoader, path)) {
+            return input.readAllBytes();
+          }
+        });
+  }
+
   static List<String> resourcePaths(ClassLoader classLoader) throws IOException {
     try (BufferedReader reader =
         new BufferedReader(
@@ -223,8 +317,8 @@ public final class ProtocolBundle {
       throw new IllegalStateException(
           "Protocol pin must define only schemas and conformance artifacts");
     }
-    validateArtifact(pin.artifacts().get("schemas"), "schemas", 21, SCHEMAS_SHA256);
-    validateArtifact(pin.artifacts().get("conformance"), "conformance", 57, CONFORMANCE_SHA256);
+    validateArtifact(pin.artifacts().get("schemas"), "schemas", 22, SCHEMAS_SHA256);
+    validateArtifact(pin.artifacts().get("conformance"), "conformance", 59, CONFORMANCE_SHA256);
   }
 
   private static void validateCryptographyPin(Pin pin) {
@@ -252,6 +346,34 @@ public final class ProtocolBundle {
         "cryptography.evaluationCount",
         CRYPTOGRAPHY_EVALUATION_COUNT,
         cryptography.evaluationCount());
+  }
+
+  private static void validateAdmissionPin(Pin pin) {
+    requireEqual("repository", REPOSITORY, pin.repository());
+    requireEqual("protocolVersion", PROTOCOL_VERSION, pin.protocolVersion());
+    requireEqual("wireNamespace", WIRE_NAMESPACE, pin.wireNamespace());
+    AdmissionPin admission = pin.admission();
+    if (admission == null) {
+      throw new IllegalStateException("Protocol pin is missing admission");
+    }
+    requireEqual("admission.path", ADMISSION_PATH, admission.path());
+    requireEqual("admission.sourceCommit", ADMISSION_SOURCE_COMMIT, admission.sourceCommit());
+    requireEqual("admission.profileId", ADMISSION_PROFILE_ID, admission.profileId());
+    requireCount(
+        "admission.manifestVersion", ADMISSION_MANIFEST_VERSION, admission.manifestVersion());
+    requireEqual(
+        "admission.cryptographyArtifactDigest",
+        ADMISSION_CRYPTOGRAPHY_ARTIFACT_DIGEST,
+        admission.cryptographyArtifactDigest());
+    requireEqual("admission.artifactDigest", ADMISSION_ARTIFACT_DIGEST, admission.artifactDigest());
+    requireCount("admission.artifactCount", ADMISSION_ARTIFACT_COUNT, admission.artifactCount());
+    requireCount("admission.caseCount", ADMISSION_CASE_COUNT, admission.caseCount());
+    requireCount(
+        "admission.evaluationCount", ADMISSION_EVALUATION_COUNT, admission.evaluationCount());
+    if (!admission.cryptographyArtifactDigest().equals(pin.cryptography().artifactDigest())) {
+      throw new IllegalStateException(
+          "Admission cryptography digest does not match the cryptography pin");
+    }
   }
 
   private static void validateArtifact(
@@ -305,6 +427,11 @@ public final class ProtocolBundle {
         pin.artifacts().get("schemas").files(),
         pin.artifacts().get("conformance").files(),
         actualBundleDigest);
+  }
+
+  private static boolean isProtocolResourcePath(String path) {
+    return (path.startsWith("schemas/") || path.startsWith("conformance/"))
+        && path.endsWith(".json");
   }
 
   private static String treeDigest(List<Map.Entry<String, byte[]>> files) {
@@ -420,6 +547,121 @@ public final class ProtocolBundle {
         evaluationCount);
   }
 
+  private static AdmissionVerification verifyAdmissionResources(
+      AdmissionPin pin, byte[] manifestBytes, ResourceReader resources) throws IOException {
+    JsonNode parsed = StrictJson.parse(manifestBytes);
+    if (!(parsed instanceof ObjectNode manifest)) {
+      throw new IllegalStateException("Admission manifest must be a JSON object");
+    }
+    requireFields("Admission manifest", manifest, ADMISSION_MANIFEST_FIELDS);
+    requireCount(
+        "Admission manifest manifestVersion",
+        pin.manifestVersion(),
+        requiredInteger(manifest, "manifestVersion"));
+    requireEqual(
+        "Admission manifest protocolVersion",
+        PROTOCOL_VERSION,
+        requiredText(manifest, "protocolVersion"));
+    requireEqual(
+        "Admission manifest profileId", pin.profileId(), requiredText(manifest, "profileId"));
+    requireEqual(
+        "Admission manifest artifactDigest",
+        pin.artifactDigest(),
+        requiredText(manifest, "artifactDigest"));
+
+    JsonNode cryptography = manifest.get("cryptography");
+    if (!(cryptography instanceof ObjectNode cryptographyObject)) {
+      throw new IllegalStateException("Admission manifest cryptography must be an object");
+    }
+    requireFields(
+        "Admission manifest cryptography", cryptographyObject, ADMISSION_CRYPTOGRAPHY_FIELDS);
+    requireEqual(
+        "Admission manifest cryptography.manifest",
+        CRYPTOGRAPHY_PATH,
+        requiredText(cryptographyObject, "manifest"));
+    requireEqual(
+        "Admission manifest cryptography.artifactDigest",
+        pin.cryptographyArtifactDigest(),
+        requiredText(cryptographyObject, "artifactDigest"));
+
+    JsonNode artifacts = requiredArray(manifest, "artifacts");
+    JsonNode cases = requiredArray(manifest, "cases");
+    requireCount("Admission manifest artifactCount", pin.artifactCount(), artifacts.size());
+    requireCount("Admission manifest caseCount", pin.caseCount(), cases.size());
+
+    int evaluationCount = 0;
+    for (JsonNode item : cases) {
+      if (!item.isObject()) {
+        throw new IllegalStateException("Admission manifest case must be an object");
+      }
+      evaluationCount += requiredArray(item, "evaluations").size();
+    }
+    requireCount("Admission manifest evaluationCount", pin.evaluationCount(), evaluationCount);
+
+    List<AdmissionArtifact> declaredArtifacts = new ArrayList<>();
+    Set<String> paths = new java.util.HashSet<>();
+    for (JsonNode item : artifacts) {
+      if (!(item instanceof ObjectNode artifact)) {
+        throw new IllegalStateException("Admission manifest artifact must be an object");
+      }
+      requireFields("Admission manifest artifact", artifact, ADMISSION_ARTIFACT_FIELDS);
+      String path = requiredText(artifact, "path");
+      validateAdmissionRepositoryPath(path);
+      if (!paths.add(path)) {
+        throw new IllegalStateException("Duplicate Admission artifact path: " + path);
+      }
+      long byteLength = requiredLong(artifact, "byteLength");
+      String sha256 = requiredText(artifact, "sha256");
+      if (!sha256.matches("sha256:[0-9a-f]{64}")) {
+        throw new IllegalStateException(
+            "Admission artifact has invalid SHA-256 identifier: " + path);
+      }
+      declaredArtifacts.add(new AdmissionArtifact(path, byteLength, sha256));
+    }
+
+    ObjectNode digestInput = manifest.deepCopy();
+    digestInput.remove("artifactDigest");
+    String actualArtifactDigest = CanonicalJson.canonicalHash(digestInput);
+    if (!actualArtifactDigest.equals(pin.artifactDigest())) {
+      throw new IllegalStateException(
+          "Admission artifactDigest mismatch: expected "
+              + pin.artifactDigest()
+              + ", got "
+              + actualArtifactDigest);
+    }
+
+    for (AdmissionArtifact artifact : declaredArtifacts) {
+      byte[] contents = resources.read(artifact.path());
+      if (contents.length != artifact.byteLength()) {
+        throw new IllegalStateException(
+            artifact.path()
+                + " byteLength mismatch: expected "
+                + artifact.byteLength()
+                + ", got "
+                + contents.length);
+      }
+      String actualSha256 = sha256Identifier(contents);
+      if (!actualSha256.equals(artifact.sha256())) {
+        throw new IllegalStateException(
+            artifact.path()
+                + " SHA-256 mismatch: expected "
+                + artifact.sha256()
+                + ", got "
+                + actualSha256);
+      }
+    }
+
+    return new AdmissionVerification(
+        pin.sourceCommit(),
+        pin.profileId(),
+        pin.manifestVersion(),
+        pin.cryptographyArtifactDigest(),
+        actualArtifactDigest,
+        declaredArtifacts.size(),
+        cases.size(),
+        evaluationCount);
+  }
+
   private static void requireFields(String label, ObjectNode object, Set<String> expected) {
     Set<String> actual = new java.util.HashSet<>();
     object.fieldNames().forEachRemaining(actual::add);
@@ -474,6 +716,16 @@ public final class ProtocolBundle {
     }
   }
 
+  private static void validateAdmissionRepositoryPath(String path) {
+    if (!path.matches("[a-z0-9][a-z0-9._-]*(?:/[a-z0-9][a-z0-9._-]*)*")
+        || path.length() > 512
+        || !(path.startsWith("admission/") || path.startsWith("schemas/"))
+        || path.equals(ADMISSION_PATH)
+        || path.equals("admission/README.md")) {
+      throw new IllegalStateException("Unsafe Admission artifact path: " + path);
+    }
+  }
+
   private static byte[] readSourceResource(Path root, String logicalPath) throws IOException {
     validateRepositoryPath(logicalPath);
     return Files.readAllBytes(sourceFile(root, logicalPath, "Cryptography artifact"));
@@ -482,6 +734,18 @@ public final class ProtocolBundle {
   private static byte[] readSourceManifest(Path root, String logicalPath) throws IOException {
     requireEqual("cryptography manifest path", CRYPTOGRAPHY_PATH, logicalPath);
     return Files.readAllBytes(sourceFile(root, logicalPath, "Cryptography manifest"));
+  }
+
+  private static byte[] readSourceAdmissionResource(Path root, String logicalPath)
+      throws IOException {
+    validateAdmissionRepositoryPath(logicalPath);
+    return Files.readAllBytes(sourceFile(root, logicalPath, "Admission artifact"));
+  }
+
+  private static byte[] readSourceAdmissionManifest(Path root, String logicalPath)
+      throws IOException {
+    requireEqual("Admission manifest path", ADMISSION_PATH, logicalPath);
+    return Files.readAllBytes(sourceFile(root, logicalPath, "Admission manifest"));
   }
 
   private static Path sourceFile(Path root, String logicalPath, String label) throws IOException {
@@ -565,12 +829,24 @@ public final class ProtocolBundle {
       int caseCount,
       int evaluationCount) {}
 
+  /** Successful verification details for the First-Admission bundle. */
+  public record AdmissionVerification(
+      String sourceCommit,
+      String profileId,
+      int manifestVersion,
+      String cryptographyArtifactDigest,
+      String artifactDigest,
+      int artifactCount,
+      int caseCount,
+      int evaluationCount) {}
+
   private record Pin(
       String repository,
       String commit,
       String protocolVersion,
       String wireNamespace,
       CryptographyPin cryptography,
+      AdmissionPin admission,
       Map<String, Artifact> artifacts,
       String bundleSha256) {}
 
@@ -584,9 +860,22 @@ public final class ProtocolBundle {
       int caseCount,
       int evaluationCount) {}
 
+  private record AdmissionPin(
+      String path,
+      String sourceCommit,
+      String profileId,
+      int manifestVersion,
+      String cryptographyArtifactDigest,
+      String artifactDigest,
+      int artifactCount,
+      int caseCount,
+      int evaluationCount) {}
+
   private record Artifact(String path, int files, String sha256) {}
 
   private record CryptographyArtifact(String path, long byteLength, String sha256) {}
+
+  private record AdmissionArtifact(String path, long byteLength, String sha256) {}
 
   @FunctionalInterface
   private interface ResourceReader {
